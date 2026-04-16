@@ -1,3 +1,10 @@
-# checkpoint/
 # data/
 # save/
+
+# Checkpoints and training logs (any directory level)
+checkpoint/
+checkpoints/
+logs/
+
+# Python
+__pycache__/
