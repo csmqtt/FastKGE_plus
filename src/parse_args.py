@@ -44,6 +44,8 @@ parser.add_argument("-num_rel_layers", dest="num_rel_layers", default=1, help="T
 parser.add_argument("-using_various_ranks", dest="using_various_ranks", default=False, help="Using various ranks or not")
 parser.add_argument("-using_various_ranks_reverse", dest="using_various_ranks_reverse", default=False, help="Using reverse various ranks or not")
 parser.add_argument("-explore", dest="explore", default=False, help="Explorable experiments")
+parser.add_argument("-lora_init", dest="lora_init", default="pissa", choices=["pissa", "xavier"], help="LoRA embedding initialization method")
+
 
 
 args = parser.parse_args()

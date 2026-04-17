@@ -10,12 +10,14 @@ from src.data_load.KnowledgeGraph import KnowledgeGraph
 from src.model.LoraKGE_Layers import TransE as LoraKGE_Layers
 from src.train import *
 from src.test import *
+from src.plot_loss import plot_loss_curve
 
 class Instructor():
     """ The instructor of the model """
     def __init__(self, args) -> None:
 
         self.args = args
+        self.loss_history = {}
 
         """ 1. Prepare for path, logger and device """
         self.prepare()
@@ -35,7 +37,13 @@ class Instructor():
         else:
             model = LoraKGE_Layers(self.args, self.kg)
         model.to(self.args.device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=float(self.args.learning_rate), weight_decay=self.args.l2)
+        
+        # [提速修改处 1]：不再使用普通的 Adam，调用模型的 LoRA+ 优化器生成器
+        optimizer = model.get_lora_plus_optimizer(  # type: ignore[attr-defined]
+            base_lr=float(self.args.learning_rate),
+            loraplus_ratio=16.0,
+            weight_decay=self.args.l2,
+        )
         return model, optimizer
 
     def reset_model(self, model=False, optimizer=False):
@@ -47,7 +55,12 @@ class Instructor():
         if model:
             self.model, self.optimizer = self.create_model()
         if optimizer:
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=float(self.args.learning_rate), weight_decay=self.args.l2)
+            # [提速修改处 2]：在切换 Snapshot 后重置优化器时，同样使用 LoRA+ 优化器
+            self.optimizer = self.model.get_lora_plus_optimizer(  # type: ignore[attr-defined]
+                base_lr=float(self.args.learning_rate), 
+                loraplus_ratio=16.0, 
+                weight_decay=self.args.l2
+            )
 
     def prepare(self):
         """ Set data path """
@@ -214,12 +227,14 @@ class Instructor():
         self.best_valid = 0.0
         self.stop_epoch = 0
         trainer = Trainer(self.args, self.kg, self.model, self.optimizer)
+        epoch_losses = []
 
         """ Trainign iteration """
         for epoch in range(int(self.args.epoch_num)):
             self.args.epoch = epoch
             """ training """
             loss, valid_res = trainer.run_epoch()
+            epoch_losses.append(float(loss))
             """ early stop """
             if self.args.debug:
                 if epoch > 0:
@@ -248,6 +263,7 @@ class Instructor():
                     f"Snapshot:{self.args.snapshot}\tEpoch:{epoch}\tLoss:{round(loss, 3)}\tMRR:{round(valid_res['mrr'] * 100, 3)}\tHits@10:{round(valid_res['hits10'] * 100, 3)}\tBest:{round(self.best_valid * 100, 3)}"
                 )
         end_time = time.time()
+        self.loss_history[self.args.snapshot] = epoch_losses
         return end_time - start_time
 
     def test(self):
@@ -303,3 +319,5 @@ if __name__ == "__main__":
     set_seeds(args.random_seed)
     ins = Instructor(args)
     ins.run()
+    # Plot after all training/testing logs have been emitted.
+    plot_loss_curve(ins.loss_history, ins.args.log_path, ins.args.logger)

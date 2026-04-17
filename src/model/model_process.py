@@ -38,7 +38,7 @@ class TrainBatchProcessor():
                                     br.to(self.args.device),
                                     bt.to(self.args.device),
                                     by.to(self.args.device) if by is not None else by,
-                                    ).float()
+                                    ).double()
             """ updata """
             batch_loss.backward()
             optimizer.step()
@@ -78,55 +78,56 @@ class DevBatchProcessor():
         results = {}
         hr2t = self.kg.snapshots[self.args.snapshot].hr2t_all
         """ Start evaluation """
-        for batch in self.data_loader:
+        with torch.no_grad():
+            for batch in self.data_loader:
             # head: (batch_size, 1)
-            head, relation, tail, label = batch
-            head = head.to(self.args.device)
-            relation = relation.to(self.args.device)
-            tail = tail.to(self.args.device)
-            label = label.to(self.args.device) # (batch_size, ent_num)
-            num += len(head)
-            stage = "Valid" if self.args.valid else "Test"
-            """ Get prediction scores """
-            pred = model.predict(head, relation, stage=stage) # (batch_size, num_ent)
-            """ filter: """
-            batch_size_range = torch.arange(pred.size()[0], device=self.args.device)
-            target_pred = pred[batch_size_range, tail]
-            pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred)
-            pred[batch_size_range, tail] = target_pred
-            if self.args.predict_result and stage == "Test":
-                logits_sorted, indices_sorted = torch.sort(pred, dim=-1, descending=True)
-                predict_result_path = "/data2/jun/lora_clkge/save/predict_result/" + "lora_kge/" + str(self.args.snapshot) + "_" + str(self.args.snapshot_test) + ".txt"
-                with open(predict_result_path, "a", encoding="utf-8") as af:
-                    batch_num = len(head)
-                    for i in range(batch_num):
-                        top1 = indices_sorted[i][0]
-                        top2 = indices_sorted[i][1]
-                        top3 = indices_sorted[i][2]
-                        af.write(self.kg.id2entity[head[i].detach().cpu().item()])
-                        af.write("\t")
-                        af.write(self.kg.id2relation[relation[i].detach().cpu().item()])
-                        af.write("\t")
-                        af.write(self.kg.id2entity[tail[i].detach().cpu().item()])
-                        af.write("\n")
-                        af.write(self.kg.id2entity[top1.detach().cpu().item()])
-                        af.write("\t")
-                        af.write(self.kg.id2entity[top2.detach().cpu().item()])
-                        af.write("\t")
-                        af.write(self.kg.id2entity[top3.detach().cpu().item()])
-                        af.write("\n")
-                        af.write("----------------------------------------------------------")
-                        af.write("\n")
-            """ rank all candidate entities """
-            ranks = 1 + torch.argsort(torch.argsort(pred, dim=1, descending=True), dim=1, descending=False)[batch_size_range, tail]
-            ranks = ranks.float()
-            results['count'] = torch.numel(ranks) + results.get('count', 0.0)
-            results['mr'] = torch.sum(ranks).item() + results.get('mr', 0.0)
-            results['mrr'] = torch.sum(1.0 / ranks).item() + results.get('mrr', 0.0)
-            for k in range(10):
-                results[f'hits{k + 1}'] = torch.numel(
-                    ranks[ranks <= (k + 1)]
-                ) + results.get(f'hits{k + 1}', 0.0)
+                head, relation, tail, label = batch
+                head = head.to(self.args.device)
+                relation = relation.to(self.args.device)
+                tail = tail.to(self.args.device)
+                label = label.to(self.args.device) # (batch_size, ent_num)
+                num += len(head)
+                stage = "Valid" if self.args.valid else "Test"
+                """ Get prediction scores """
+                pred = model.predict(head, relation, stage=stage) # (batch_size, num_ent)
+                """ filter: """
+                batch_size_range = torch.arange(pred.size()[0], device=self.args.device)
+                target_pred = pred[batch_size_range, tail]
+                pred = torch.where(label.bool(), -torch.ones_like(pred) * 10000000, pred)
+                pred[batch_size_range, tail] = target_pred
+                if self.args.predict_result and stage == "Test":
+                    logits_sorted, indices_sorted = torch.sort(pred, dim=-1, descending=True)
+                    predict_result_path = "/data2/jun/lora_clkge/save/predict_result/" + "lora_kge/" + str(self.args.snapshot) + "_" + str(self.args.snapshot_test) + ".txt"
+                    with open(predict_result_path, "a", encoding="utf-8") as af:
+                        batch_num = len(head)
+                        for i in range(batch_num):
+                            top1 = indices_sorted[i][0]
+                            top2 = indices_sorted[i][1]
+                            top3 = indices_sorted[i][2]
+                            af.write(self.kg.id2entity[head[i].detach().cpu().item()])
+                            af.write("\t")
+                            af.write(self.kg.id2relation[relation[i].detach().cpu().item()])
+                            af.write("\t")
+                            af.write(self.kg.id2entity[tail[i].detach().cpu().item()])
+                            af.write("\n")
+                            af.write(self.kg.id2entity[top1.detach().cpu().item()])
+                            af.write("\t")
+                            af.write(self.kg.id2entity[top2.detach().cpu().item()])
+                            af.write("\t")
+                            af.write(self.kg.id2entity[top3.detach().cpu().item()])
+                            af.write("\n")
+                            af.write("----------------------------------------------------------")
+                            af.write("\n")
+                """ rank all candidate entities """
+                ranks = 1 + torch.argsort(torch.argsort(pred, dim=1, descending=True), dim=1, descending=False)[batch_size_range, tail]
+                ranks = ranks.float()
+                results['count'] = torch.numel(ranks) + results.get('count', 0.0)
+                results['mr'] = torch.sum(ranks).item() + results.get('mr', 0.0)
+                results['mrr'] = torch.sum(1.0 / ranks).item() + results.get('mrr', 0.0)
+                for k in range(10):
+                    results[f'hits{k + 1}'] = torch.numel(
+                        ranks[ranks <= (k + 1)]
+                    ) + results.get(f'hits{k + 1}', 0.0)
         count = float(results['count'])
         for key, val in results.items():
             results[key] = round(val / count, 4)
