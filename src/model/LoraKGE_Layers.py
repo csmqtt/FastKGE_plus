@@ -1,6 +1,58 @@
 from typing import cast
 
+import torch.nn.functional as F
+
 from .BaseModel import *
+
+
+class DoRALoraEmbedding(loralib.Embedding):
+    """
+    DoRA-inspired adapter: keep frozen base embedding + standard LoRA (B @ A),
+    multiply the low-rank delta by a learnable per-dimension scale lora_g (shape emb_dim).
+    Named lora_g so loralib.lora_state_dict() keeps it in checkpoints.
+    merge_weights=False: merged weight path cannot represent g-scaled deltas.
+    """
+
+    def __init__(
+        self,
+        num_embeddings: int,
+        embedding_dim: int,
+        r: int = 0,
+        lora_alpha: int = 1,
+        merge_weights: bool = False,
+        **kwargs,
+    ):
+        super().__init__(
+            num_embeddings,
+            embedding_dim,
+            r,
+            lora_alpha=lora_alpha,
+            merge_weights=merge_weights,
+            **kwargs,
+        )
+        if r > 0:
+            self.lora_g = nn.Parameter(
+                torch.ones(embedding_dim, dtype=self.weight.dtype, device=self.weight.device)
+            )
+        else:
+            self.register_parameter("lora_g", None)
+
+    def forward(self, x: torch.Tensor):
+        if self.r > 0 and not self.merged:
+            result = nn.Embedding.forward(self, x)
+            after_A = F.embedding(
+                x,
+                self.lora_A.transpose(0, 1),
+                self.padding_idx,
+                self.max_norm,
+                self.norm_type,
+                self.scale_grad_by_freq,
+                self.sparse,
+            )
+            delta = (after_A @ self.lora_B.transpose(0, 1)) * self.scaling
+            result = result + delta * self.lora_g
+            return result
+        return nn.Embedding.forward(self, x)
 
 
 class LoraKGE_Layers(BaseModel):
@@ -21,7 +73,7 @@ class LoraKGE_Layers(BaseModel):
         rel_embeddings = nn.Embedding(self.kg.snapshots[self.args.snapshot + 1].num_rel, self.args.emb_dim).to(self.args.device).double()
         xavier_normal_(ent_embeddings.weight)
         xavier_normal_(rel_embeddings.weight)
-        return deepcopy(ent_embeddings), deepcopy(rel_embeddings)
+        return ent_embeddings, rel_embeddings
 
     def get_new_ordered_entities(self):
         all_new_entities = {}
@@ -84,70 +136,136 @@ class LoraKGE_Layers(BaseModel):
 
         for _ in range(int(self.args.num_ent_layers)):
             r = int(self.args.ent_r_list[_])
-            new_ent_embeddings = loralib.Embedding(self.lora_ent_len, self.args.emb_dim, r).to(self.args.device).double()
-            if init_method == "xavier":
+            if init_method == "dora":
+                new_ent_embeddings = DoRALoraEmbedding(
+                    self.lora_ent_len, self.args.emb_dim, r, merge_weights=False
+                ).to(self.args.device).double()
                 xavier_normal_(new_ent_embeddings.weight)
             else:
-                with torch.no_grad():
-                    temp_w = torch.randn(self.lora_ent_len, self.args.emb_dim, device=self.args.device, dtype=torch.float32) * ref_std + ref_mean
-                    U, S, Vh = torch.linalg.svd(temp_w, full_matrices=False)
-                    effective_r = min(r, Vh.size(0), U.size(1))
-                    lora_a_param = getattr(new_ent_embeddings, "lora_embedding_A", None)
-                    lora_b_param = getattr(new_ent_embeddings, "lora_embedding_B", None)
-                    if lora_a_param is None or lora_b_param is None:
-                        lora_a_param = getattr(new_ent_embeddings, "lora_A", None)
-                        lora_b_param = getattr(new_ent_embeddings, "lora_B", None)
-                    if lora_a_param is not None and lora_b_param is not None:
-                        lora_a = cast(torch.Tensor, lora_a_param.data)
-                        lora_b = cast(torch.Tensor, lora_b_param.data)
-                        us = U[:, :effective_r] @ torch.diag(S[:effective_r])
-                        vh = Vh[:effective_r, :]
-                        if lora_a.shape[1] == self.args.emb_dim and lora_b.shape[0] == self.lora_ent_len:
-                            # Layout-1: A[r, emb_dim], B[num_ent, r]
-                            lora_a[:effective_r, :] = vh.clone()
-                            lora_b[:, :effective_r] = us.clone()
-                        elif lora_a.shape[1] == self.lora_ent_len and lora_b.shape[0] == self.args.emb_dim:
-                            # Layout-2: A[r, num_ent], B[emb_dim, r]
-                            lora_a[:effective_r, :] = us.T.clone()
-                            lora_b[:, :effective_r] = vh.T.clone()
+                new_ent_embeddings = loralib.Embedding(self.lora_ent_len, self.args.emb_dim, r).to(self.args.device).double()
+                if init_method == "xavier":
+                    xavier_normal_(new_ent_embeddings.weight)
+                elif init_method == "qr":
+                    with torch.no_grad():
+                        effective_r = min(r, self.lora_ent_len, self.args.emb_dim)
+                        left_rand = torch.randn(self.lora_ent_len, effective_r, device=self.args.device, dtype=torch.float32)
+                        right_rand = torch.randn(self.args.emb_dim, effective_r, device=self.args.device, dtype=torch.float32)
+                        left_q, _ = torch.linalg.qr(left_rand, mode='reduced')
+                        right_q, _ = torch.linalg.qr(right_rand, mode='reduced')
+                        us = left_q[:, :effective_r] * ref_std
+                        vh = right_q[:, :effective_r].T
+                        lora_a_param = getattr(new_ent_embeddings, "lora_embedding_A", None)
+                        lora_b_param = getattr(new_ent_embeddings, "lora_embedding_B", None)
+                        if lora_a_param is None or lora_b_param is None:
+                            lora_a_param = getattr(new_ent_embeddings, "lora_A", None)
+                            lora_b_param = getattr(new_ent_embeddings, "lora_B", None)
+                        if lora_a_param is not None and lora_b_param is not None:
+                            lora_a = cast(torch.Tensor, lora_a_param.data)
+                            lora_b = cast(torch.Tensor, lora_b_param.data)
+                            if lora_a.shape[1] == self.args.emb_dim and lora_b.shape[0] == self.lora_ent_len:
+                                lora_a[:effective_r, :] = vh.clone()
+                                lora_b[:, :effective_r] = us.clone()
+                            elif lora_a.shape[1] == self.lora_ent_len and lora_b.shape[0] == self.args.emb_dim:
+                                lora_a[:effective_r, :] = us.T.clone()
+                                lora_b[:, :effective_r] = vh.T.clone()
+                            else:
+                                xavier_normal_(new_ent_embeddings.weight)
+                            new_ent_embeddings.weight.data.zero_()
                         else:
                             xavier_normal_(new_ent_embeddings.weight)
-                        new_ent_embeddings.weight.data.zero_()
-                    else:
-                        xavier_normal_(new_ent_embeddings.weight)
-            lora_ent_embeddings_list.append(deepcopy(new_ent_embeddings))
+                else:
+                    with torch.no_grad():
+                        temp_w = torch.randn(self.lora_ent_len, self.args.emb_dim, device=self.args.device, dtype=torch.float32) * ref_std + ref_mean
+                        U, S, Vh = torch.linalg.svd(temp_w, full_matrices=False)
+                        effective_r = min(r, Vh.size(0), U.size(1))
+                        lora_a_param = getattr(new_ent_embeddings, "lora_embedding_A", None)
+                        lora_b_param = getattr(new_ent_embeddings, "lora_embedding_B", None)
+                        if lora_a_param is None or lora_b_param is None:
+                            lora_a_param = getattr(new_ent_embeddings, "lora_A", None)
+                            lora_b_param = getattr(new_ent_embeddings, "lora_B", None)
+                        if lora_a_param is not None and lora_b_param is not None:
+                            lora_a = cast(torch.Tensor, lora_a_param.data)
+                            lora_b = cast(torch.Tensor, lora_b_param.data)
+                            us = U[:, :effective_r] @ torch.diag(S[:effective_r])
+                            vh = Vh[:effective_r, :]
+                            if lora_a.shape[1] == self.args.emb_dim and lora_b.shape[0] == self.lora_ent_len:
+                                lora_a[:effective_r, :] = vh.clone()
+                                lora_b[:, :effective_r] = us.clone()
+                            elif lora_a.shape[1] == self.lora_ent_len and lora_b.shape[0] == self.args.emb_dim:
+                                lora_a[:effective_r, :] = us.T.clone()
+                                lora_b[:, :effective_r] = vh.T.clone()
+                            else:
+                                xavier_normal_(new_ent_embeddings.weight)
+                            new_ent_embeddings.weight.data.zero_()
+                        else:
+                            xavier_normal_(new_ent_embeddings.weight)
+            lora_ent_embeddings_list.append(new_ent_embeddings)
 
-        new_rel_embeddings = loralib.Embedding(new_rel_embeddings_len, self.args.emb_dim, int(self.args.rel_r)).to(self.args.device).double()
-        if init_method == "xavier":
+        if init_method == "dora":
+            new_rel_embeddings = DoRALoraEmbedding(
+                new_rel_embeddings_len, self.args.emb_dim, int(self.args.rel_r), merge_weights=False
+            ).to(self.args.device).double()
             xavier_normal_(new_rel_embeddings.weight)
         else:
-            with torch.no_grad():
-                rel_temp_w = torch.randn(new_rel_embeddings_len, self.args.emb_dim, device=self.args.device, dtype=torch.float32) * ref_std + ref_mean
-                U, S, Vh = torch.linalg.svd(rel_temp_w, full_matrices=False)
-                rel_r = min(int(self.args.rel_r), Vh.size(0), U.size(1))
-                rel_a_param = getattr(new_rel_embeddings, "lora_embedding_A", None)
-                rel_b_param = getattr(new_rel_embeddings, "lora_embedding_B", None)
-                if rel_a_param is None or rel_b_param is None:
-                    rel_a_param = getattr(new_rel_embeddings, "lora_A", None)
-                    rel_b_param = getattr(new_rel_embeddings, "lora_B", None)
-                if rel_a_param is not None and rel_b_param is not None:
-                    rel_a = cast(torch.Tensor, rel_a_param.data)
-                    rel_b = cast(torch.Tensor, rel_b_param.data)
-                    rel_us = U[:, :rel_r] @ torch.diag(S[:rel_r])
-                    rel_vh = Vh[:rel_r, :]
-                    if rel_a.shape[1] == self.args.emb_dim and rel_b.shape[0] == new_rel_embeddings_len:
-                        rel_a[:rel_r, :] = rel_vh.clone()
-                        rel_b[:, :rel_r] = rel_us.clone()
-                    elif rel_a.shape[1] == new_rel_embeddings_len and rel_b.shape[0] == self.args.emb_dim:
-                        rel_a[:rel_r, :] = rel_us.T.clone()
-                        rel_b[:, :rel_r] = rel_vh.T.clone()
+            new_rel_embeddings = loralib.Embedding(new_rel_embeddings_len, self.args.emb_dim, int(self.args.rel_r)).to(self.args.device).double()
+            if init_method == "xavier":
+                xavier_normal_(new_rel_embeddings.weight)
+            elif init_method == "qr":
+                with torch.no_grad():
+                    rel_r = min(int(self.args.rel_r), new_rel_embeddings_len, self.args.emb_dim)
+                    left_rand = torch.randn(new_rel_embeddings_len, rel_r, device=self.args.device, dtype=torch.float32)
+                    right_rand = torch.randn(self.args.emb_dim, rel_r, device=self.args.device, dtype=torch.float32)
+                    left_q, _ = torch.linalg.qr(left_rand, mode='reduced')
+                    right_q, _ = torch.linalg.qr(right_rand, mode='reduced')
+                    rel_us = left_q[:, :rel_r] * ref_std
+                    rel_vh = right_q[:, :rel_r].T
+                    rel_a_param = getattr(new_rel_embeddings, "lora_embedding_A", None)
+                    rel_b_param = getattr(new_rel_embeddings, "lora_embedding_B", None)
+                    if rel_a_param is None or rel_b_param is None:
+                        rel_a_param = getattr(new_rel_embeddings, "lora_A", None)
+                        rel_b_param = getattr(new_rel_embeddings, "lora_B", None)
+                    if rel_a_param is not None and rel_b_param is not None:
+                        rel_a = cast(torch.Tensor, rel_a_param.data)
+                        rel_b = cast(torch.Tensor, rel_b_param.data)
+                        if rel_a.shape[1] == self.args.emb_dim and rel_b.shape[0] == new_rel_embeddings_len:
+                            rel_a[:rel_r, :] = rel_vh.clone()
+                            rel_b[:, :rel_r] = rel_us.clone()
+                        elif rel_a.shape[1] == new_rel_embeddings_len and rel_b.shape[0] == self.args.emb_dim:
+                            rel_a[:rel_r, :] = rel_us.T.clone()
+                            rel_b[:, :rel_r] = rel_vh.T.clone()
+                        else:
+                            xavier_normal_(new_rel_embeddings.weight)
+                        new_rel_embeddings.weight.data.zero_()
                     else:
                         xavier_normal_(new_rel_embeddings.weight)
-                    new_rel_embeddings.weight.data.zero_()
-                else:
-                    xavier_normal_(new_rel_embeddings.weight)
+            else:
+                with torch.no_grad():
+                    rel_temp_w = torch.randn(new_rel_embeddings_len, self.args.emb_dim, device=self.args.device, dtype=torch.float32) * ref_std + ref_mean
+                    U, S, Vh = torch.linalg.svd(rel_temp_w, full_matrices=False)
+                    rel_r = min(int(self.args.rel_r), Vh.size(0), U.size(1))
+                    rel_a_param = getattr(new_rel_embeddings, "lora_embedding_A", None)
+                    rel_b_param = getattr(new_rel_embeddings, "lora_embedding_B", None)
+                    if rel_a_param is None or rel_b_param is None:
+                        rel_a_param = getattr(new_rel_embeddings, "lora_A", None)
+                        rel_b_param = getattr(new_rel_embeddings, "lora_B", None)
+                    if rel_a_param is not None and rel_b_param is not None:
+                        rel_a = cast(torch.Tensor, rel_a_param.data)
+                        rel_b = cast(torch.Tensor, rel_b_param.data)
+                        rel_us = U[:, :rel_r] @ torch.diag(S[:rel_r])
+                        rel_vh = Vh[:rel_r, :]
+                        if rel_a.shape[1] == self.args.emb_dim and rel_b.shape[0] == new_rel_embeddings_len:
+                            rel_a[:rel_r, :] = rel_vh.clone()
+                            rel_b[:, :rel_r] = rel_us.clone()
+                        elif rel_a.shape[1] == new_rel_embeddings_len and rel_b.shape[0] == self.args.emb_dim:
+                            rel_a[:rel_r, :] = rel_us.T.clone()
+                            rel_b[:, :rel_r] = rel_vh.T.clone()
+                        else:
+                            xavier_normal_(new_rel_embeddings.weight)
+                        new_rel_embeddings.weight.data.zero_()
+                    else:
+                        xavier_normal_(new_rel_embeddings.weight)
 
-        return deepcopy(lora_ent_embeddings_list), deepcopy(new_rel_embeddings)
+        return list(lora_ent_embeddings_list), new_rel_embeddings
 
     def switch_snapshot(self):
         if self.lora_ent_embeddings_list is not None:
@@ -156,14 +274,20 @@ class LoraKGE_Layers(BaseModel):
             new_rel_embeddings = self.rel_embeddings.weight.data
             for lora_id in range(int(self.args.num_ent_layers) - 1):
                 start_id = self.kg.snapshots[self.args.snapshot - 1].num_ent + lora_id * self.lora_ent_len
-                new_ent_embeddings[start_id: start_id + self.lora_ent_len] = Parameter(self.lora_ent_embeddings_list[lora_id].forward(torch.arange(int(self.lora_ent_len)).to(self.args.device)))
+                new_ent_embeddings[start_id: start_id + self.lora_ent_len] = Parameter(
+                    self.lora_ent_embeddings_list[lora_id](torch.arange(int(self.lora_ent_len)).to(self.args.device)).detach().clone()
+                )
             last_start_id = self.kg.snapshots[self.args.snapshot - 1].num_ent + (int(self.args.num_ent_layers) - 1) * self.lora_ent_len
             last_lora_id = int(self.args.num_ent_layers) - 1
-            new_ent_embeddings[last_start_id:] = Parameter(self.lora_ent_embeddings_list[last_lora_id].forward(torch.arange(len(new_ent_embeddings[last_start_id:])).to(self.args.device)))
+            new_ent_embeddings[last_start_id:] = Parameter(
+                self.lora_ent_embeddings_list[last_lora_id](torch.arange(len(new_ent_embeddings[last_start_id:])).to(self.args.device)).detach().clone()
+            )
             ent_indices = list(range(self.kg.snapshots[self.args.snapshot - 1].num_ent)) + cast(list[int], self.new_ordered_entities)
             assert len(new_ent_embeddings) == len(ent_indices)
             new_ent_embeddings = new_ent_embeddings[ent_indices]
-            new_rel_embeddings[self.kg.snapshots[self.args.snapshot - 1].num_rel:] = Parameter(deepcopy(self.lora_rel_embeddings.forward(torch.arange(len(self.lora_rel_embeddings.weight)).to(self.args.device))))
+            new_rel_embeddings[self.kg.snapshots[self.args.snapshot - 1].num_rel:] = Parameter(
+                self.lora_rel_embeddings(torch.arange(len(self.lora_rel_embeddings.weight)).to(self.args.device)).detach().clone()
+            )
             self.ent_embeddings.weight = Parameter(new_ent_embeddings)
             self.rel_embeddings.weight = Parameter(new_rel_embeddings)
         self.store_old_parameters()
