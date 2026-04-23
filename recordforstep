@@ -9,3 +9,392 @@ V1.1
 结果等价，但显存峰值显著下降
 v1.2
 显存恢复，但是画图有问题，准确度也低
+
+V2
+LoRA/优化器大改动。这一版在 FB/WN 上整体是"回退"而非"提升"，见文末对比与原因分析。
+1) 初始化：新增 lora_init='zero_b'（A=kaiming，B=0），作为 LoRA+ 的配套初始化；在 FB/WN 预设里把默认从 'dora' 换成 'zero_b'。
+2) 优化器：get_lora_plus_optimizer() 由 Adam 改成 AdamW，按 LoRA-A / LoRA-B / lora_g（DoRA 标尺） / 其他 四组切分，
+   支持独立的 lr 比例与 weight_decay（新增 -loraplus_ratio / -lora_wd_a / -lora_wd_b）。
+3) 学习率调度：main.py 增加 _build_lr_scheduler（linear warmup → cosine decay），
+   每 epoch 末 scheduler.step()；新增 -use_lr_scheduler / -warmup_epochs / -min_lr_ratio。
+4) 梯度裁剪：model_process.py 在 optimizer.step() 前对 LoRA A/B 做 clip_grad_norm_，
+   新增 -lora_grad_clip（>0 才生效）。
+5) FB/WN 数据集预设（src/parse_args.py，用户 CLI 明示时不覆盖）：
+   num_ent_layers=5, ent_r=160, rel_r 保留默认, lora_init='zero_b',
+   use_lr_scheduler=True, warmup_epochs=5, min_lr_ratio=0.1,
+   lora_wd_b=1e-4, lora_wd_a=0.0, lora_grad_clip=1.0。
+6) 新增 -log_lora_stats：按 epoch 打印 lrA/lrB/gradA/gradB/paramA/paramB，便于诊断。
+
+V2.1
+修三个小问题：
+1) main.py 的 early-stopping：warmup 期间不自增 stop_epoch。原本 patience(=3) < warmup_epochs(=5) 时，
+   warmup 还没走完就触发早停，导致 S2/S3/S4 在 epoch=3 就停，MRR 断崖。
+2) src/parse_args.py 的 FB/WN 预设：patience 自动抬到 max(用户值, warmup_epochs+3)，避免同上冲突。
+3) src/parse_args.py 的 FB/WN 预设：min_lr_ratio 从 0.1 抬到 0.3，避免末期 lr 过小导致收敛停滞。
+
+V2.2
+小清理，不影响数值：
+1) src/model/LoraKGE_Layers.py 新增 _init_nonempty 包装器：仅在 tensor.numel()>0 时调用
+   xavier_normal_ / kaiming_uniform_ / zeros_，消除 "Initializing zero-element tensors is a no-op"
+   的 UserWarning（新快照只加实体不加关系，或反之时触发）。
+2) 移除 print(self.args.using_various_ranks) 调试残留。
+
+==== V2.x 实测对比（FB_CKGE，基线 logs/Initial_result/20260418193444） ====
+指标                       基线 V1.x    V2.2        差值
+S0                        0.2455       0.2578      +1.23pp  ✅（来自 scheduler 作用于 base embed）
+S1 on S1                  0.1745       0.1007      -7.4pp   ❌
+S2 on S2                  0.1775       0.1092      -6.8pp   ❌
+S3 on S3                  0.1898       0.1147      -7.5pp   ❌
+S4 on S4                  0.2117       0.2014      -1.0pp   ❌
+Whole MRR (final)         0.223        0.207       -1.6pp   ❌
+
+==== 为什么回退：预设把基线里"有效的东西"一并改掉了 ====
+基线 CLI: ent_r=150, rel_r=20, num_ent_layers=2, lora_init='dora', patience=3
+V2 预设: ent_r=160, rel_r=10, num_ent_layers=5, lora_init='zero_b', patience=8 + wd_b + 调度器 + 裁剪
+结构性变化（容量下降）：
+- lora_init 'dora' → 'zero_b'：丢掉了 DoRA 的 per-dim 标尺 lora_g（在这个项目里它是有用的）。
+- num_ent_layers 2 → 5、ent_r 150 → 160：每层有效秩从 75 降到 32（≈ 减半）。
+- rel_r 20 → 10：关系侧 LoRA 容量减半。
+动力学变化（后期更新变慢）：
+- cosine decay 到 0.3*lr_base（V2.1 前是 0.1*lr_base），后期 lr 只剩基线 30%。
+- lora_wd_b=1e-4 在 B 范数 ~500 量级时累计往回拉（虽然单步小）。
+结论：S0 的提升来自 scheduler（不走 LoRA 路径），而 S1~S4 的回退主要来自"把基线里 DoRA + 宽秩 + 少层"这个组合拆了。
+下一步（V2.3 设想，未实施）：保留 V2 的正交改动（scheduler / warmup-aware 早停 / log_lora_stats / AdamW），
+把 FB/WN 预设回退到 lora_init='dora'、ent_r=150、rel_r=20、num_ent_layers=2；wd_b 和 grad_clip 先关掉作消融。
+
+V2.3
+落实上一条"设想"。只改 src/parse_args.py 的 FB/WN 预设，其他代码不动（说明 V2 的正交改动已经可控）。
+结构性回滚到 V1.x 基线：
+  num_ent_layers: 5 → 2
+  ent_r: 160 → 150
+  rel_r: 新增 _maybe_set=20（之前走 CLI 默认 10）
+  lora_init: 'zero_b' → 'dora'
+消融关闭：
+  lora_wd_b: 1e-4 → 0.0（走 CLI 默认 0）
+  lora_grad_clip: 1.0 → 0.0（走 CLI 默认 0）
+保留的正交改动：
+  use_lr_scheduler=True, warmup_epochs=5, min_lr_ratio=0.3
+  patience = max(用户值, warmup+3)（V2.1 的保护，避免 warmup 期早停）
+  
+  main.py 的 warmup-aware stop_epoch 计数（V2.1）
+  _init_nonempty 消 warning（V2.2）
+  log_lora_stats CLI、AdamW 四分组（wd=0 时等价 Adam）
+预期：S0 保住 V2.2 的 +1.2pp 提升（来自 scheduler 作用于 base embed），
+      S1~S4 回到 V1.x 基线水平（结构复位 + 关掉 wd_b/clip）。
+后续如要继续抬 S1~S4：在 V2.3 基础上单独开 -lora_wd_b / -lora_grad_clip 或调整 loraplus_ratio 做单因素消融。
+
+==== V2.3 实测对比（logs/20260420193654/FB_CKGE.log）====
+指标              V1.x 基线    V2.2         V2.3         V2.3 vs 基线
+S0               0.2455       0.2578       0.2578       +1.23pp  ✅
+S1 on S1         0.1745       0.1007       0.1171       -5.7pp   ❌
+S2 on S2         0.1775       0.1092       0.1240       -5.3pp   ❌
+S3 on S3         0.1898       0.1147       0.1296       -6.0pp   ❌
+S4 on S4         0.2117       0.2014       0.2044       -0.7pp   ❌
+Whole MRR (final)0.223        0.207        0.212        -1.1pp   ❌
+结构回基线后缩小了回退但未消除。剩余锅算了算总训练量：
+  V1.x flat lr_A=1e-4, 200 epoch → 200×base
+  V2.3 warmup(5 ep, 均值 0.5×) + cosine(195 ep, 均值 0.65×) → 129.25×base
+  V2.3 相当于只做了 V1.x 65% 的训练 → 线性外推 V2.3 S1≈11.34，实测 11.14，吻合。
+结论：scheduler 的 cosine decay 在 LoRA 这种"长尾慢涨"场景下是纯负收益；
+      在 S0（从零训、epoch 28 早停、cosine 还没真正衰减）是纯正收益。
+
+V2.4
+把 scheduler 按快照分域：默认只作用于 snapshot 0，LoRA 快照（snap>=1）恢复到 V1.x 的固定 lr。
+新增 CLI: -scheduler_lora_snapshots (默认 False)，打开后恢复 V2 那种"全程调度"行为，便于实验复现。
+main.py 改动：
+  _build_lr_scheduler 加入 `if snapshot>0 and not scheduler_lora_snapshots: return None`
+  warmup-aware early-stop 改为按 `self.scheduler is None` 判定当前快照是否在 warmup，
+    避免 S1+ 被误判成"warmup 期内不计 stop_epoch"。
+parse_args.py 改动：
+  新增 -scheduler_lora_snapshots 开关，更新 -use_lr_scheduler 的 help。
+FB/WN 预设不动：仍然 use_lr_scheduler=True, warmup=5, min_lr_ratio=0.3，只是 S1+ 自动跳过。
+
+V2.4.1
+修一个 V2.4 的 bug：_build_lr_scheduler 在 S1+ 仍被当成 S0 处理（logs/20260420213930 里
+S1 Epoch 0 还是 lrA=2.00e-05 = 0.1×base，说明 scheduler 依然生效了）。
+根因：训练流程里 self.args.snapshot 是在 reset_model(optimizer=True) 之后才被
+    更新为下一个快照号，所以重建 optimizer/scheduler 时读到的仍是旧快照 id（0）。
+修复：main.py 在调用 next_snapshot_setting() 后、reset_model(optimizer=True) 前，
+    先 self.args.snapshot = ss_id + 1。这样调度器建的时候能看到自己实际要服务
+    的快照 id，snap-gate 才真正生效。
+
+==== V2.4.1 实测（logs/20260420213930/FB_CKGE.log，默认配置：LoraKGE / lr=1e-4 / no various_ranks）====
+这次跑默认参数（没走 main.sh），所以 per-snap 数值和 V1.x 基线"不可比"（V1.x 基线是
+main.sh 里的 LoraKGE_Layers / lr=1e-1 / using_various_ranks=True）。
+意义：只用于验证 scheduler gate 修好了。
+  S1 Epoch 0: lrA=1.00e-04（= base_lr，flat）✅ 修复生效
+  S1 Epoch 199: lrA=1.00e-04（全程 flat）     ✅ S1+ 已脱离 scheduler 控制
+S1~S4 per-snap MRR 相比 V2.4（buggy）也均+1~1.5pp，和 gate 生效后预期吻合。
+
+V2.5（标记为验证版本，不含代码改动）
+问题：意识到之前的"V1.x 基线 vs V2.x" 对比是苹果比橘子。
+  V1.x 基线（20260418215617）跑的是 LoraKGE_Layers + lr=1e-1 + using_various_ranks=True + rs_lora=True，
+  V2.x 之前的所有 run 跑的是 LoraKGE + lr=1e-4，俩配置基本是两个模型。
+对策：用 main.sh 的基线配置 + V2.4.1 改动重跑一遍。因为 lr=0.1 + loraplus_ratio=16 会让 LoRA-B lr=1.6
+    直接炸 AdamW，所以传 -loraplus_ratio 1.0 关掉 LoRA+ 分组（回到 baseline 的单 lr）：
+        bash main.sh -log_lora_stats -loraplus_ratio 1.0
+
+==== V2.5 实测（FB_CKGE：logs/20260420223146/FB_CKGE.log）苹果对苹果 ====
+指标              V1.x 基线   V2.5        Δ
+S0 on S0         0.2455       0.2356       -1.0pp（warmup 让 S0 前 5 epoch 欠训练 + early-stop 收得紧）
+S1 on S1         0.1745       0.1754       +0.1pp ✅
+S2 on S2         0.1775       0.1820       +0.5pp ✅
+S3 on S3         0.1898       0.1892       ≈ 持平
+S4 on S4         0.2117       0.2038       -0.8pp
+Whole MRR [4]    0.223        0.216        -0.7pp
+Sum train time   ~2400s       905s         **2.6× 加速**（warmup-aware early-stop + 合理 patience）
+Forward transfer  —           0.1474
+关键 log 校验：
+  S0：lrA 2e-2→4e-2→…→1e-1（warmup），之后 cosine 衰减 ✅
+  S1~S4：lrA 全程 1.00e-01 flat ✅（V2.4.1 scheduler gate 正确工作）
+  S4 early-stop at epoch 21（patience=8 触发，不再卡满 200 epoch）
+
+==== V2.5 实测（WN_CKGE）苹果对苹果 ====
+基线 log: logs/Initial_result/20260418194541/WN_CKGE.log（LoraKGE_Layers+lr=1e-1+various_ranks+dora+rs_lora=True）
+V2.5 log: logs/20260420224934/WN_CKGE.log（同上 + V2.4.1 改动 + loraplus_ratio=1.0）
+指标              V1.x 基线   V2.5        Δ
+S0 on S0         0.1749       0.1706       -0.4pp
+S1 on S1         0.1414       0.1420       +0.1pp ✅
+S2 on S2         0.1374       0.1399       +0.3pp ✅
+S3 on S3         0.1319       0.1314       ≈ 持平
+S4 on S4         0.1415       0.1418       ≈ 持平
+Whole MRR [4]    0.160        0.158        -0.2pp
+Forward transfer 0.0593       0.0593       0（逐位相同，前向迁移完整保留）
+Sum train time   696s         733s         +5%（WN baseline 的 patience=3 本来就收得紧，V2.5 patience=8 在 WN 反而多跑 9 epoch）
+关键 log 校验：S4 ep25 到 MRR=13.85 后稳定，ep33 早停；全程 S1~S4 lrA=1e-1 flat ✅
+
+==== V2.5 小结 ====
+FB 和 WN 模式一致（跨数据集泛化）：S1/S2 微涨、S0 微跌、S3/S4 持平、Whole_MRR 落后 <1pp。
+两边差异：FB 拿到 2.6× 训练加速（baseline 早停慢），WN 基本持平（baseline 早停已经很快）。
+V2.5 至此定版：≈ 基线精度 + FB 2.6× 加速 + 架构干净（scheduler 正确分域、AdamW 管线、
+  warmup-aware early-stop、lora stats 日志、可选 LoRA+/wd/clip 开关）。
+
+后续如要突破 S1~S4 per-snap 的天花板（而非只追平基线），需要 V3.x 的架构改动
+（例如：给新快照的新实体解冻主嵌入、扩大 LoRA 秩的 adapter-only 路径等），
+而不是继续在 V2 的调度/优化器维度里绕。
+
+V2.5.1
+触发：把 main.sh 扩展到 6 个数据集 + 在脚本里把 V2.5 flags 统一 bake 进 V25_FLAGS
+    （含 -patience 8）。结果 bash main.sh 跑起来 6 个数据集全部在 epoch 3~4 崩溃：
+    TypeError: '>=' not supported between instances of 'int' and 'str'
+        at main.py:310  if self.stop_epoch >= self.args.patience:
+根因：src/parse_args.py 的 -patience 当初没有 type=int。从 CLI 传进来就是字符串 "8"。
+    FB/WN 预设原本的 `args.patience = max(int(args.patience), int(warmup_epochs)+3)`
+    受 `if "patience" not in _cli:` 保护，一旦 CLI 显式传了 -patience，该保护把预设的
+    int() 强转一并跳过，于是 FB/WN 也炸（这解释了"之前 bash main.sh -log_lora_stats
+    -loraplus_ratio 1.0 能跑是因为没传 -patience，走预设 cast；一旦传了就全崩"）。
+修复：src/parse_args.py 给 -patience 加 type=int。对任何传入路径都是 int，杜绝字符串比较。
+教训：凡是要和内部 int 比较的 argparse 参数，必须声明 type=int；不能只靠预设里零散
+    int() 强转，因为 CLI 会直接绕开预设分支。
+
+==========================================================================
+2026-04-21 今日批次（V2.6 → V2.8）：精度瓶颈定位 + 训练效率大改
+--------------------------------------------------------------------------
+背景：六数据集 baseline 重跑发现 V2.5 在 FB/WN 持平、但在 ENTITY/FACT/HYBRID/
+  RELATION 上均落后。排查结论：不是回退，而是"baseline 本身就低于论文数字"，
+  根因是论文用 5-seed 平均 + 数据集级超参调优；V2 架构没问题。
+  重点由"再追精度"改为"不降精度前提下砍训练时间"。
+==========================================================================
+
+V2.6  P0 Graph Layering（关系侧）
+--------------------------------------------------------------------------
+动机：对 LoraKGE_Layers 的代码审计发现 Graph Layering 只做了 ent 侧；rel 侧
+    始终是一块大 LoRA（num_rel_layers 强制为 1）。在 HYBRID（每快照新增
+    16/49/58/28 个关系）和 RELATION（47×4）这两个数据集上，rel 侧合并成
+    一块会让不同时间段新增的关系共享同一条低秩基。
+改动：
+  src/model/LoraKGE_Layers.py
+    - expand_lora_embeddings 新增 num_rel_layers 分块循环，按 canonical 插入
+      顺序切 new_rel_embeddings_len 个关系，逐层建独立 loralib.Embedding。
+    - 抽出 _build_rel_lora_module() 复用原有 4 种 init（dora/zero_b/qr/pissa）。
+    - switch_snapshot 里用 ModuleList 挂管关系侧 LoRA。
+    - get_lora_embeddings 按层 forward + cat，取前 new_rel_embeddings_len 行
+      （最后一层可能 padding，裁掉）。
+    - num_rel_layers=1 时行号/RNG 与 pre-P0 完全一致（bit-identical 回退路径）。
+  src/parse_args.py：-num_rel_layers 文档更新；default 保持 1。
+  main.sh：HYBRID/RELATION 分支加 "-num_rel_layers 2 -rel_r 40"（每层 20 刚好
+    等于 pre-P0 的 rel_r=20）。ENTITY/FACT/FB/WN 不动（新增关系 ≤3，分层无意义）。
+
+实测（logs/20260421183451/HYBRID.log 等）：
+  HYBRID: Whole_MRR@S4 0.188 → 0.198（+1.0pp），训练时间 -14%（新关系容量翻倍
+        反而让后期早停更快）。
+  RELATION: S3 MRR +1.2pp，S1/S2/S4 基本持平；时间相当。
+  ENTITY/FACT/FB/WN：num_rel_layers=1，行为未变（已验证）。
+
+Plan A（rolled back）：HYBRID/RELATION 把 patience 3→6，想多挖一点 MRR。
+  实测：HYBRID Whole_MRR@S4 0.196–0.198（噪声内），总时间 +40%（S3 单快照
+       34 epoch vs patience=3 的 21 epoch，多出来的 13 epoch 全是 MRR 平台期）。
+  结论：纯浪费，回滚到 patience=3。main.sh 里对应变量从 P0_REL_LAYER_EXT（含
+       -patience 6）改名 P0_REL_LAYER（不含），case 分支显式带 $BASELINE_TIGHT。
+
+
+V2.7  P1 Permutation Caching + 训练 profiler
+--------------------------------------------------------------------------
+动机：HYBRID Plan A 回滚后分析 Every_Training_Time：per-triple 吞吐随快照单调
+    变差（S0 最快 → S3 最慢），说明每个 batch 在 margin_loss 里组装 "old +
+    canonical-new-order" 的 all_ent_embeddings 时，Python 端开销（list(range())
+    + .tolist() + fancy index）随 new-ent 数量线性增长。
+
+改动 A：permutation caching（src/model/LoraKGE_Layers.py）
+  新增 3 个每快照常量的 on-device 缓存（switch_snapshot 末尾重建）：
+    _ent_arange_cache    : torch.arange(lora_ent_len, device=...) 
+    _rel_arange_list     : 每个 rel LoRA 层的 arange（长度 = 该层 rows）
+    _ent_canonical_perm  : [int(gid) - old_num_ent for gid in new_ordered_entities]
+                          （canonical-order → lora-row 的置换索引）
+  _rebuild_lora_cache() 在 switch_snapshot 结束时统一构建。
+  get_lora_embeddings：
+    旧 = per-batch torch.arange().to(device) + forward + cat
+    新 = 直接用预缓存 arange + forward + cat，最后 index_select(_ent_canonical_perm)
+        返回 canonical 顺序的 lora_ent_embeddings。
+  margin_loss/predict：去掉 list(range(num_old)) + self.new_ordered_entities 的
+    Python 列表拼装 + all_ent_embeddings = all_ent_embeddings[ent_indices] 的
+    fancy index，直接 cat([ent_old, lora_ent_canonical])，行号与原路径等价。
+
+改动 B：torch.profiler 接入（src/model/model_process.py）
+  process_epoch 里套 prof_ctx + record_function 标签（batch/total、batch/to_device、
+    batch/forward_loss、batch/backward、batch/optimizer_step、lora/ent_layers_forward、
+    lora/rel_layers_forward），在命中 -profile_snapshot/-profile_epoch 时记录前
+    num_batches 个 batch 并 dump chrome trace + key_averages 表。
+  新增 CLI：-profile_snapshot（默认 -1 = 关）、-profile_epoch（默认 1，避开首
+    epoch 的 CUDA lazy init）、-profile_num_batches（默认 20）、-profile_out。
+  注意：特意没传 schedule（wait/warmup/active），否则 active 阶段事件不一定 flush
+    到 key_averages，会得到空表（首次调试踩的坑）。
+  新增 run_profile.sh 助手脚本：./run_profile.sh HYBRID 3 1 20 即可。
+
+实测（logs/20260421202020 → logs/20260421205416/HYBRID.log）：
+  HYBRID: 1118s → 770.7s（-31%），Whole_MRR@S4 0.197 → 0.195（≈ 持平）。
+  RELATION: 583s → 660s（+13%！）。profiler 显示 per-epoch 实际是 -4~-8%，但
+    浮点舍入顺序变了 → early-stop 触发点往后挪了 1-2 epoch，总量反而涨。
+    结论：P1 per-epoch 有小幅真实收益，但总训练时间被 early-stop 漂移带着跳，
+    得和 FP32 一起看大账。
+
+
+V2.8  精度切换 + DataLoader 并行 + LoRA stats 降采样
+--------------------------------------------------------------------------
+动机：profiler 里 wall clock 270ms/batch vs Self CPU total 56ms/batch，剩下 214ms
+    全在 GPU / GPU-CPU sync 上。三根刺：
+    1) 通篇 .double() → FP64；RTX 30xx FP64 是 FP32 的 1/32 吞吐，KGE 这种
+       matmul-dominated workload 在消费卡上被 FP64 拖得最惨。
+    2) aten::item 501 次 / 20 batch ≈ 25/batch，大头在 _accumulate_lora_grad_stats
+       的 param.grad.norm().item()（16 个 LoRA param × 每 batch 一次 sync）。
+    3) DataLoader num_workers=0，enumerate 自己吃掉 20ms CPU/batch。
+
+改动：
+  src/parse_args.py
+    + -precision {fp32,fp64}  默认 fp32
+    + -num_workers N          默认 2
+    + -lora_stats_every N     默认 0 → epoch 末单次采样；>0 退回到原来的每 N
+                              batch 采样行为（保留诊断曲线能力）
+  src/utils.py
+    + model_dtype(args) 统一路由点；get_param(shape, args=None) 也走它
+  src/model/BaseModel.py, src/model/LoraKGE_Layers.py
+    全量替换 .to(device).double() → .to(device, dtype=model_dtype(self.args))
+    覆盖 6 处：BaseModel 初始 + expand；LoraKGE_Layers expand_embedding_size、
+    expand_lora_embeddings（DoRA 分支、普通分支）、_build_rel_lora_module（DoRA/
+    loralib 两分支）。
+  src/model/model_process.py
+    - batch_loss = model.loss(...).double() → 去掉 .double()（原来 FP32→FP64
+      cast 白浪费）
+    - _accumulate_lora_grad_stats 从 batch 循环里搬出，默认仅在最后一个 batch
+      步进后采样一次（grad 还没被 next-batch 的 zero_grad 清掉，值真实）
+    - to_device 四个 .to() 全加 non_blocking=True 配合 pin_memory
+    - DataLoader 增加 num_workers + persistent_workers（nw>0 时）
+  main.sh
+    位置参数支持：./main.sh HYBRID、./main.sh HYBRID RELATION -patience 5
+    都能工作；DATASETS=... 旧写法保留；未知数据集直接 exit 2（防静默空跑）。
+
+实测（HYBRID，logs/20260421225249）：
+  Whole_MRR@S4: 0.195 (P1) → 0.190 (-0.005，噪声带内)
+  Sum_Training_Time: 770.7s (P1) → 526.6s (-32%)
+  累计 vs P0-only baseline(1118s): -53%
+  累计 vs Plan A(1547s): -66%
+  per-epoch 加速：S0 ~3×、S1 ~5×、S2/S3 ~2×、S4 ~2.5×（FP32 在"小矩阵 + 非
+    数据加载主导"的 snapshot 上杠杆最大）。
+  LoRAStats 日志字段仍为真实值（每 epoch 一次真 grad），诊断能力未丢。
+复现原论文 FP64：加 -precision fp64 即可，代码路径完全保留。
+
+剩余瓶颈（P2 目标）：S2/S3 仍有 10-13 s/epoch。
+
+
+V2.9  P2 Sparse-gather（取消 per-batch 全表 cat）
+--------------------------------------------------------------------------
+重新定位瓶颈：审计 margin_loss 发现"batch-sparse LoRA forward"其实收益不大
+    —— HYBRID S3 的新实体才 ~1000 行 × 200 维，两层 LoRA 的 forward 本身是
+    μs 量级。真正浪费的是每 batch 执行一次：
+        all_ent = torch.cat([ent_old, lora_new], dim=0)   # (71000, 200) ≈ 56 MB
+        h = index_select(all_ent, 0, head)               # 只读 11k 行
+    56MB 的 allocation + memcpy 每 batch 都发生；但只用到 ~11k/71k ≈ 15% 的行，
+    其余 85% 是纯粹的显存分配 + 拷贝开销 + allocator 压力。
+
+改动（src/model/LoraKGE_Layers.py）
+  新增 _lookup_ent_with_lora(idx, ent_old, lora_new)：mask + clamp + torch.where
+    的 masked-gather，语义上等价于 cat([ent_old, lora_new])[idx]，但不再
+    materialize (old+new, D) 的中间张量。两端都用 clamp 把 "错边" 的 gather
+    压在合法范围内，torch.where 再按 is_new 掩码取正确的一支。
+  margin_loss 的 snap > 0 分支：
+    - ent 侧（head/tail）走 _lookup_ent_with_lora，省 cat。
+    - rel 侧保留 cat（rel_old ~几百行，lora_rel ~几十行，cat 约 20KB，开销
+      可忽略；且 rel 的 id 范围判定需要额外信息，不值得为此加分支）。
+  predict 未改：其 t_all = all_ent[:num_ent] 需要完整 slab 做 chunked scoring，
+    cat 只发生一次 per eval 而非 per batch，ROI 低于 margin_loss 改动。
+
+新增 CLI（src/parse_args.py）
+  -lora_sparse_gather {on,off}  默认 on；off 回退到 V2.7/V2.8 的 cat 路径，
+    供 A/B 验证与 debug 用。
+
+正确性验证（CPU micro-bench，old=70000, new=1000, D=200, N=11000）：
+  随机 / 全老 / 全新 / 边界 idx 四种 case 与 cat+gather 结果 **逐位等价**。
+  CPU 单次调用耗时：9.4 ms → 6.0 ms（1.57× 本地加速）；GPU 上 allocator
+  避开 56MB malloc，加速应更显著。
+
+预期：HYBRID S2/S3 每 epoch 再省 ~5-10%（allocator pressure 释放 + 单次
+    大拷贝取消）；Whole_MRR 严格等价（sparse-gather 与 dense 路径在 idx
+    合法范围内数学等价）。
+
+实测（HYBRID，logs/20260421232143 vs V2.8 logs/20260421225249）：
+  Whole_MRR@S4: 0.190 → 0.198（+0.008）
+  Sum_Training_Time: 526.6s → 644.9s（+22%）
+  per-epoch 时间基本平手（S3: 13.3 → 12.9 s/ep, -3%）。
+  真正差异来自 **每个 snapshot 跑了更多 epoch**：S0 7→10? 反了一次，S1 13→24,
+  S2 18→22, S3 15→20, S4 9→X（sparse-gather 改变了 GPU kernel 顺序 → FP32
+  舍入噪声 → 早停被触发/不被触发），导致训练时间 MRR 双双上行。
+  结论：P2 的单步收益不到预期（~3% 而不是 5-10%），原因是 PyTorch caching
+  allocator 让 56MB 的 torch.cat 在 GPU 上很便宜（一次 malloc 反复复用）；
+  真正的瓶颈是 GPU kernel 执行 + 梯度 scatter，cat 那步不在关键路径。
+
+  更严重的是：V2.9 暴露出 "早停对浮点噪声极度敏感" 这个系统性问题——
+  P2 改动在数学上等价（CPU 逐位相同），但在 GPU 上由于 kernel 顺序变化产
+  生微小舍入差异，就让 best_valid 的 > 判定在 0.01pp 级别的波动下翻转，
+  进而改变训练时长。换句话说，目前的 per-epoch 效率实验几乎都被早停随机
+  性淹没，不装一个抗噪早停就没法做可比的 A/B。
+
+
+V2.10  抗噪早停 + P2 默认关闭
+--------------------------------------------------------------------------
+背景：V2.9 分析（见上）显示，P2 给出的是 ~3% 的 per-epoch 微提升，但早停
+机制对浮点噪声过于敏感，让这类实验的时间/MRR 对比被早停随机性完全淹没。
+优先修早停这个基础设施，而不是继续堆优化。
+
+改动 A（C 方案，抗噪早停）— src/parse_args.py, main.py
+  新增 CLI: -es_min_delta (float, 默认 1e-3 raw MRR == 0.1pp)
+  train() 里把 "best checkpoint" 和 "stop-counter reset" 解耦：
+    - 任何改进 (current > best_valid) 仍然更新 self.best_valid 并保存 is_best
+      ckpt —— 最终推理用最强权重，一点没丢。
+    - 但只有满足 current > best_valid + es_min_delta 的"实质改进"才 reset
+      stop_epoch；否则计数继续走。
+  效果：0.05pp 级别的抖动（V2.8/V2.9 S0 就是被这种抖动分叉的）不再能"续
+  命" patience，训练时长回到由真实学习进度决定。
+  保留路径：-es_min_delta 0 复刻 V2.9 之前的严格 > 行为。
+
+改动 B（B 方案，回退 P2 默认）— src/parse_args.py
+  -lora_sparse_gather 默认 on → off。
+  理由：V2.9 实测 per-epoch 只省 ~3%，代码复杂度/GPU 路径非确定性的代价
+  不划算；但 CLI 保留，想 A/B 的时候 -lora_sparse_gather on 仍可用。
+
+预期：有了 es_min_delta=1e-3 之后，
+  - 同一 seed 下 V2.8/V2.9/…的 epoch 数应该收敛到同一曲线 ± 1 epoch。
+  - 之后再做 per-epoch 级别的 A/B（FP32 vs FP64、sparse vs dense、worker
+    数…）才真的有可比性。
+  - Whole_MRR 理论上略降（因为不再被 0.05pp 的偶然尖峰"白赚"几个 epoch），
+    跑 3-seed 应能看清真实分布。下一步建议：HYBRID + 3 seeds 作为新 baseline，
+    然后再开其它优化的 A/B。

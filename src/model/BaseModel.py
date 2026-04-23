@@ -8,8 +8,9 @@ class BaseModel(nn.Module):
         self.kg = kg
 
         """ initialize the entity and relation embeddings for the first snapshot """
-        self.ent_embeddings = nn.Embedding(self.kg.snapshots[0].num_ent, self.args.emb_dim).to(self.args.device).double()
-        self.rel_embeddings = nn.Embedding(self.kg.snapshots[0].num_rel, self.args.emb_dim).to(self.args.device).double()
+        _dtype = model_dtype(self.args)
+        self.ent_embeddings = nn.Embedding(self.kg.snapshots[0].num_ent, self.args.emb_dim).to(self.args.device, dtype=_dtype)
+        self.rel_embeddings = nn.Embedding(self.kg.snapshots[0].num_rel, self.args.emb_dim).to(self.args.device, dtype=_dtype)
         xavier_normal_(self.ent_embeddings.weight)
         xavier_normal_(self.rel_embeddings.weight)
 
@@ -23,8 +24,9 @@ class BaseModel(nn.Module):
                 xavier_normal_(param)
 
     def expand_embedding_size(self):
-        ent_embeddings = nn.Embedding(self.kg.snapshots[self.args.snapshot + 1].num_ent, self.args.emb_dim).to(self.args.device).double()
-        rel_embeddings = nn.Embedding(self.kg.snapshots[self.args.snapshot + 1].num_rel, self.args.emb_dim).to(self.args.device).double()
+        _dtype = model_dtype(self.args)
+        ent_embeddings = nn.Embedding(self.kg.snapshots[self.args.snapshot + 1].num_ent, self.args.emb_dim).to(self.args.device, dtype=_dtype)
+        rel_embeddings = nn.Embedding(self.kg.snapshots[self.args.snapshot + 1].num_rel, self.args.emb_dim).to(self.args.device, dtype=_dtype)
         xavier_normal_(ent_embeddings.weight)
         xavier_normal_(rel_embeddings.weight)
         return deepcopy(ent_embeddings), deepcopy(rel_embeddings)

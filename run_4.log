@@ -1,0 +1,658 @@
+nohup: ignoring input
+2026-04-21 01:48:36,472: Namespace(save_path='./checkpoint/ENTITY', log_path='./logs/20260421014829/ENTITY', data_path='./data/ENTITY/', random_seed=3407, dataset='ENTITY', gpu='0', model_name='LoraKGE_Layers', batch_size=1024, learning_rate='1e-1', epoch_num=200, note='', snapshot_num=5, emb_dim=200, margin=8.0, neg_ratio=10, l2=0.0, num_layer=1, skip_previous='False', train_new=True, valid_metrics='mrr', patience=3, debug=False, record=False, predict_result=False, r=100, ent_r='150', rel_r='20', r_fixed=True, using_multi_layers=False, multi_layers_path='train_sorted_by_edges_betweenness.txt', num_ent_layers='2', num_rel_layers='1', using_various_ranks='True', using_various_ranks_reverse=False, explore=False, lora_init='xavier', use_rs_lora=False, log_lora_stats=True, loraplus_ratio=1.0, lora_wd_a=0.0, lora_wd_b=0.0, lora_grad_clip=0.0, use_lr_scheduler=False, warmup_epochs=5, min_lr_ratio=0.1, scheduler_lora_snapshots=False, logger=<RootLogger root (INFO)>, device=device(type='cuda', index=0))
+Start training =============================
+2026-04-21 01:48:44,134: Snapshot:0	Epoch:0	Loss:31.847	MRR:16.3	Hits@10:37.21	Best:16.3	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:48:47,624: Snapshot:0	Epoch:1	Loss:14.983	MRR:28.61	Hits@10:51.24	Best:28.61	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:48:50,850: Snapshot:0	Epoch:2	Loss:5.819	MRR:32.15	Hits@10:54.84	Best:32.15	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:48:54,038: Snapshot:0	Epoch:3	Loss:2.672	MRR:32.76	Hits@10:55.08	Best:32.76	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:48:57,303: Snapshot:0	Epoch:4	Loss:1.642	MRR:32.91	Hits@10:55.27	Best:32.91	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:49:00,694: Snapshot:0	Epoch:5	Loss:1.196	MRR:32.71	Hits@10:55.37	Best:32.91	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:49:04,056: Snapshot:0	Epoch:6	Loss:0.977	MRR:32.49	Hits@10:54.52	Best:32.91	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 01:49:07,331: Early Stopping! Snapshot:0 Epoch: 7 Best Results: 32.91
+2026-04-21 01:49:07,400: => loading checkpoint './checkpoint/ENTITY/0model_best.tar'
+2026-04-21 01:49:09,555: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 01:49:27,146: Snapshot:1	Epoch:0	Loss:12.308	MRR:16.0	Hits@10:28.63	Best:16.0	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.493e-03,gradB=5.098e-04,paramA=6.436e+02,paramB=4.823e+02,countA=3,countB=3)
+2026-04-21 01:49:35,538: Snapshot:1	Epoch:1	Loss:4.707	MRR:17.75	Hits@10:32.07	Best:17.75	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.214e-03,gradB=3.123e-04,paramA=7.530e+02,paramB=5.287e+02,countA=3,countB=3)
+2026-04-21 01:49:43,758: Snapshot:1	Epoch:2	Loss:3.878	MRR:18.98	Hits@10:33.99	Best:18.98	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.023e-03,gradB=3.131e-04,paramA=8.451e+02,paramB=5.707e+02,countA=3,countB=3)
+2026-04-21 01:49:53,426: Snapshot:1	Epoch:3	Loss:3.439	MRR:19.49	Hits@10:35.14	Best:19.49	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.130e-04,gradB=3.158e-04,paramA=9.288e+02,paramB=6.109e+02,countA=3,countB=3)
+2026-04-21 01:50:01,821: Snapshot:1	Epoch:4	Loss:3.165	MRR:20.17	Hits@10:36.19	Best:20.17	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.356e-04,gradB=3.108e-04,paramA=1.005e+03,paramB=6.477e+02,countA=3,countB=3)
+2026-04-21 01:50:10,220: Snapshot:1	Epoch:5	Loss:2.949	MRR:20.68	Hits@10:36.81	Best:20.68	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.751e-04,gradB=3.053e-04,paramA=1.075e+03,paramB=6.817e+02,countA=3,countB=3)
+2026-04-21 01:50:18,492: Snapshot:1	Epoch:6	Loss:2.779	MRR:20.7	Hits@10:37.15	Best:20.7	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.325e-04,gradB=3.006e-04,paramA=1.142e+03,paramB=7.142e+02,countA=3,countB=3)
+2026-04-21 01:50:27,676: Snapshot:1	Epoch:7	Loss:2.697	MRR:21.06	Hits@10:37.97	Best:21.06	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.908e-04,gradB=2.917e-04,paramA=1.206e+03,paramB=7.444e+02,countA=3,countB=3)
+2026-04-21 01:50:35,894: Snapshot:1	Epoch:8	Loss:2.572	MRR:21.27	Hits@10:38.27	Best:21.27	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.562e-04,gradB=2.847e-04,paramA=1.266e+03,paramB=7.728e+02,countA=3,countB=3)
+2026-04-21 01:50:44,455: Snapshot:1	Epoch:9	Loss:2.472	MRR:21.41	Hits@10:38.3	Best:21.41	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.207e-04,gradB=2.765e-04,paramA=1.323e+03,paramB=7.996e+02,countA=3,countB=3)
+2026-04-21 01:50:52,858: Snapshot:1	Epoch:10	Loss:2.429	MRR:21.76	Hits@10:38.83	Best:21.76	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.979e-04,gradB=2.717e-04,paramA=1.379e+03,paramB=8.258e+02,countA=3,countB=3)
+2026-04-21 01:51:02,376: Snapshot:1	Epoch:11	Loss:2.377	MRR:21.86	Hits@10:39.24	Best:21.86	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.769e-04,gradB=2.670e-04,paramA=1.433e+03,paramB=8.511e+02,countA=3,countB=3)
+2026-04-21 01:51:10,706: Snapshot:1	Epoch:12	Loss:2.32	MRR:21.84	Hits@10:39.03	Best:21.86	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.524e-04,gradB=2.600e-04,paramA=1.484e+03,paramB=8.759e+02,countA=3,countB=3)
+2026-04-21 01:51:19,418: Snapshot:1	Epoch:13	Loss:2.27	MRR:21.92	Hits@10:39.25	Best:21.92	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.326e-04,gradB=2.526e-04,paramA=1.535e+03,paramB=8.988e+02,countA=3,countB=3)
+2026-04-21 01:51:29,295: Snapshot:1	Epoch:14	Loss:2.264	MRR:22.01	Hits@10:39.49	Best:22.01	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.171e-04,gradB=2.495e-04,paramA=1.585e+03,paramB=9.206e+02,countA=3,countB=3)
+2026-04-21 01:51:37,493: Snapshot:1	Epoch:15	Loss:2.25	MRR:22.36	Hits@10:39.89	Best:22.36	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.010e-04,gradB=2.453e-04,paramA=1.633e+03,paramB=9.424e+02,countA=3,countB=3)
+2026-04-21 01:51:46,039: Snapshot:1	Epoch:16	Loss:2.192	MRR:22.22	Hits@10:39.73	Best:22.36	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.835e-04,gradB=2.378e-04,paramA=1.681e+03,paramB=9.637e+02,countA=3,countB=3)
+2026-04-21 01:51:54,230: Snapshot:1	Epoch:17	Loss:2.17	MRR:22.14	Hits@10:39.81	Best:22.36	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.734e-04,gradB=2.353e-04,paramA=1.727e+03,paramB=9.846e+02,countA=3,countB=3)
+2026-04-21 01:52:03,739: Snapshot:1	Epoch:18	Loss:2.121	MRR:22.42	Hits@10:39.88	Best:22.42	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.583e-04,gradB=2.292e-04,paramA=1.773e+03,paramB=1.004e+03,countA=3,countB=3)
+2026-04-21 01:52:12,170: Snapshot:1	Epoch:19	Loss:2.112	MRR:22.63	Hits@10:40.12	Best:22.63	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.476e-04,gradB=2.263e-04,paramA=1.819e+03,paramB=1.024e+03,countA=3,countB=3)
+2026-04-21 01:52:20,453: Snapshot:1	Epoch:20	Loss:2.119	MRR:22.72	Hits@10:40.36	Best:22.72	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.370e-04,gradB=2.222e-04,paramA=1.864e+03,paramB=1.043e+03,countA=3,countB=3)
+2026-04-21 01:52:29,003: Snapshot:1	Epoch:21	Loss:2.094	MRR:22.96	Hits@10:40.75	Best:22.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.285e-04,gradB=2.200e-04,paramA=1.908e+03,paramB=1.062e+03,countA=3,countB=3)
+2026-04-21 01:52:38,647: Snapshot:1	Epoch:22	Loss:2.074	MRR:22.75	Hits@10:40.44	Best:22.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.145e-04,gradB=2.146e-04,paramA=1.952e+03,paramB=1.080e+03,countA=3,countB=3)
+2026-04-21 01:52:46,806: Snapshot:1	Epoch:23	Loss:2.028	MRR:22.9	Hits@10:40.7	Best:22.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.042e-04,gradB=2.102e-04,paramA=1.995e+03,paramB=1.098e+03,countA=3,countB=3)
+2026-04-21 01:52:55,147: Early Stopping! Snapshot:1 Epoch: 24 Best Results: 22.96
+2026-04-21 01:52:55,236: => loading checkpoint './checkpoint/ENTITY/1model_best.tar'
+2026-04-21 01:53:03,471: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 01:53:23,668: Snapshot:2	Epoch:0	Loss:11.698	MRR:14.9	Hits@10:26.71	Best:14.9	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.278e-03,gradB=4.695e-04,paramA=6.421e+02,paramB=4.822e+02,countA=3,countB=3)
+2026-04-21 01:53:33,469: Snapshot:2	Epoch:1	Loss:4.525	MRR:16.99	Hits@10:30.23	Best:16.99	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.114e-03,gradB=2.961e-04,paramA=7.505e+02,paramB=5.268e+02,countA=3,countB=3)
+2026-04-21 01:53:44,324: Snapshot:2	Epoch:2	Loss:3.786	MRR:17.77	Hits@10:31.72	Best:17.77	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.514e-04,gradB=2.936e-04,paramA=8.434e+02,paramB=5.685e+02,countA=3,countB=3)
+2026-04-21 01:53:54,065: Snapshot:2	Epoch:3	Loss:3.414	MRR:18.35	Hits@10:32.98	Best:18.35	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.520e-04,gradB=2.902e-04,paramA=9.283e+02,paramB=6.075e+02,countA=3,countB=3)
+2026-04-21 01:54:04,064: Snapshot:2	Epoch:4	Loss:3.205	MRR:18.78	Hits@10:33.44	Best:18.78	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.812e-04,gradB=2.873e-04,paramA=1.006e+03,paramB=6.438e+02,countA=3,countB=3)
+2026-04-21 01:54:13,906: Snapshot:2	Epoch:5	Loss:3.027	MRR:18.93	Hits@10:33.74	Best:18.93	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.256e-04,gradB=2.828e-04,paramA=1.078e+03,paramB=6.783e+02,countA=3,countB=3)
+2026-04-21 01:54:24,933: Snapshot:2	Epoch:6	Loss:2.846	MRR:19.12	Hits@10:34.24	Best:19.12	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.768e-04,gradB=2.734e-04,paramA=1.146e+03,paramB=7.102e+02,countA=3,countB=3)
+2026-04-21 01:54:34,755: Snapshot:2	Epoch:7	Loss:2.748	MRR:19.32	Hits@10:34.84	Best:19.32	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.410e-04,gradB=2.668e-04,paramA=1.210e+03,paramB=7.399e+02,countA=3,countB=3)
+2026-04-21 01:54:44,921: Snapshot:2	Epoch:8	Loss:2.659	MRR:19.72	Hits@10:35.17	Best:19.72	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.037e-04,gradB=2.604e-04,paramA=1.270e+03,paramB=7.680e+02,countA=3,countB=3)
+2026-04-21 01:54:55,854: Snapshot:2	Epoch:9	Loss:2.608	MRR:19.54	Hits@10:34.87	Best:19.72	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.812e-04,gradB=2.554e-04,paramA=1.329e+03,paramB=7.951e+02,countA=3,countB=3)
+2026-04-21 01:55:05,746: Snapshot:2	Epoch:10	Loss:2.537	MRR:19.71	Hits@10:35.47	Best:19.72	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.541e-04,gradB=2.505e-04,paramA=1.385e+03,paramB=8.208e+02,countA=3,countB=3)
+2026-04-21 01:55:15,497: Snapshot:2	Epoch:11	Loss:2.526	MRR:19.74	Hits@10:35.4	Best:19.74	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.355e-04,gradB=2.433e-04,paramA=1.439e+03,paramB=8.452e+02,countA=3,countB=3)
+2026-04-21 01:55:26,445: Snapshot:2	Epoch:12	Loss:2.449	MRR:20.04	Hits@10:35.91	Best:20.04	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.115e-04,gradB=2.371e-04,paramA=1.492e+03,paramB=8.689e+02,countA=3,countB=3)
+2026-04-21 01:55:36,250: Snapshot:2	Epoch:13	Loss:2.404	MRR:19.92	Hits@10:35.74	Best:20.04	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.952e-04,gradB=2.328e-04,paramA=1.543e+03,paramB=8.919e+02,countA=3,countB=3)
+2026-04-21 01:55:45,975: Snapshot:2	Epoch:14	Loss:2.401	MRR:19.95	Hits@10:35.69	Best:20.04	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.780e-04,gradB=2.276e-04,paramA=1.593e+03,paramB=9.143e+02,countA=3,countB=3)
+2026-04-21 01:55:55,740: Snapshot:2	Epoch:15	Loss:2.355	MRR:20.05	Hits@10:36.04	Best:20.05	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.657e-04,gradB=2.246e-04,paramA=1.643e+03,paramB=9.362e+02,countA=3,countB=3)
+2026-04-21 01:56:06,720: Snapshot:2	Epoch:16	Loss:2.326	MRR:20.08	Hits@10:36.17	Best:20.08	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.513e-04,gradB=2.199e-04,paramA=1.691e+03,paramB=9.575e+02,countA=3,countB=3)
+2026-04-21 01:56:16,439: Snapshot:2	Epoch:17	Loss:2.288	MRR:20.21	Hits@10:35.9	Best:20.21	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.361e-04,gradB=2.147e-04,paramA=1.737e+03,paramB=9.778e+02,countA=3,countB=3)
+2026-04-21 01:56:26,279: Snapshot:2	Epoch:18	Loss:2.258	MRR:20.26	Hits@10:36.14	Best:20.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.255e-04,gradB=2.112e-04,paramA=1.784e+03,paramB=9.983e+02,countA=3,countB=3)
+2026-04-21 01:56:37,516: Snapshot:2	Epoch:19	Loss:2.254	MRR:20.2	Hits@10:35.83	Best:20.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.143e-04,gradB=2.066e-04,paramA=1.830e+03,paramB=1.018e+03,countA=3,countB=3)
+2026-04-21 01:56:47,301: Snapshot:2	Epoch:20	Loss:2.24	MRR:20.23	Hits@10:36.28	Best:20.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.036e-04,gradB=2.031e-04,paramA=1.875e+03,paramB=1.037e+03,countA=3,countB=3)
+2026-04-21 01:56:57,075: Early Stopping! Snapshot:2 Epoch: 21 Best Results: 20.26
+2026-04-21 01:56:57,163: => loading checkpoint './checkpoint/ENTITY/2model_best.tar'
+2026-04-21 01:57:13,758: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
+|     2      | 0.2033 | 0.1201 | 0.2274 | 0.2827 |  0.3644 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 01:57:34,620: Snapshot:3	Epoch:0	Loss:10.5	MRR:14.37	Hits@10:25.41	Best:14.37	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.185e-03,gradB=4.524e-04,paramA=6.357e+02,paramB=4.932e+02,countA=3,countB=3)
+2026-04-21 01:57:46,505: Snapshot:3	Epoch:1	Loss:3.749	MRR:16.42	Hits@10:29.42	Best:16.42	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.041e-03,gradB=2.733e-04,paramA=7.363e+02,paramB=5.336e+02,countA=3,countB=3)
+2026-04-21 01:57:57,169: Snapshot:3	Epoch:2	Loss:3.11	MRR:16.94	Hits@10:30.82	Best:16.94	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.762e-04,gradB=2.663e-04,paramA=8.233e+02,paramB=5.719e+02,countA=3,countB=3)
+2026-04-21 01:58:07,798: Snapshot:3	Epoch:3	Loss:2.793	MRR:17.64	Hits@10:31.92	Best:17.64	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.925e-04,gradB=2.643e-04,paramA=9.031e+02,paramB=6.083e+02,countA=3,countB=3)
+2026-04-21 01:58:19,805: Snapshot:3	Epoch:4	Loss:2.586	MRR:18.11	Hits@10:32.65	Best:18.11	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.298e-04,gradB=2.598e-04,paramA=9.771e+02,paramB=6.421e+02,countA=3,countB=3)
+2026-04-21 01:58:30,301: Snapshot:3	Epoch:5	Loss:2.447	MRR:18.18	Hits@10:33.02	Best:18.18	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.749e-04,gradB=2.548e-04,paramA=1.045e+03,paramB=6.736e+02,countA=3,countB=3)
+2026-04-21 01:58:41,024: Snapshot:3	Epoch:6	Loss:2.368	MRR:18.53	Hits@10:33.45	Best:18.53	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.360e-04,gradB=2.496e-04,paramA=1.109e+03,paramB=7.034e+02,countA=3,countB=3)
+2026-04-21 01:58:53,500: Snapshot:3	Epoch:7	Loss:2.274	MRR:18.86	Hits@10:34.0	Best:18.86	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.011e-04,gradB=2.436e-04,paramA=1.170e+03,paramB=7.319e+02,countA=3,countB=3)
+2026-04-21 01:59:03,960: Snapshot:3	Epoch:8	Loss:2.204	MRR:18.94	Hits@10:34.42	Best:18.94	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.667e-04,gradB=2.358e-04,paramA=1.227e+03,paramB=7.587e+02,countA=3,countB=3)
+2026-04-21 01:59:14,632: Snapshot:3	Epoch:9	Loss:2.161	MRR:19.1	Hits@10:34.5	Best:19.1	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.425e-04,gradB=2.309e-04,paramA=1.283e+03,paramB=7.841e+02,countA=3,countB=3)
+2026-04-21 01:59:26,805: Snapshot:3	Epoch:10	Loss:2.122	MRR:19.02	Hits@10:34.2	Best:19.1	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.179e-04,gradB=2.248e-04,paramA=1.335e+03,paramB=8.086e+02,countA=3,countB=3)
+2026-04-21 01:59:37,342: Snapshot:3	Epoch:11	Loss:2.078	MRR:18.96	Hits@10:34.32	Best:19.1	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.966e-04,gradB=2.203e-04,paramA=1.386e+03,paramB=8.326e+02,countA=3,countB=3)
+2026-04-21 01:59:47,986: Snapshot:3	Epoch:12	Loss:2.057	MRR:19.24	Hits@10:34.39	Best:19.24	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.808e-04,gradB=2.150e-04,paramA=1.436e+03,paramB=8.552e+02,countA=3,countB=3)
+2026-04-21 02:00:00,269: Snapshot:3	Epoch:13	Loss:1.995	MRR:19.19	Hits@10:34.61	Best:19.24	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.620e-04,gradB=2.098e-04,paramA=1.484e+03,paramB=8.769e+02,countA=3,countB=3)
+2026-04-21 02:00:10,846: Snapshot:3	Epoch:14	Loss:2.0	MRR:19.11	Hits@10:34.19	Best:19.24	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.482e-04,gradB=2.065e-04,paramA=1.532e+03,paramB=8.985e+02,countA=3,countB=3)
+2026-04-21 02:00:21,463: Snapshot:3	Epoch:15	Loss:1.994	MRR:19.32	Hits@10:34.53	Best:19.32	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.345e-04,gradB=2.031e-04,paramA=1.578e+03,paramB=9.195e+02,countA=3,countB=3)
+2026-04-21 02:00:33,545: Snapshot:3	Epoch:16	Loss:1.948	MRR:19.29	Hits@10:34.64	Best:19.32	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.210e-04,gradB=1.981e-04,paramA=1.623e+03,paramB=9.400e+02,countA=3,countB=3)
+2026-04-21 02:00:44,070: Snapshot:3	Epoch:17	Loss:1.917	MRR:19.28	Hits@10:34.31	Best:19.32	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.095e-04,gradB=1.950e-04,paramA=1.668e+03,paramB=9.596e+02,countA=3,countB=3)
+2026-04-21 02:00:54,771: Early Stopping! Snapshot:3 Epoch: 18 Best Results: 19.32
+2026-04-21 02:00:54,871: => loading checkpoint './checkpoint/ENTITY/3model_best.tar'
+2026-04-21 02:01:20,121: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
+|     2      | 0.2033 | 0.1201 | 0.2274 | 0.2827 |  0.3644 |
+|     3      | 0.193  | 0.1145 | 0.2134 | 0.2675 |  0.3478 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:01:38,226: Snapshot:4	Epoch:0	Loss:7.623	MRR:17.82	Hits@10:29.68	Best:17.82	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.361e-03,gradB=5.103e-04,paramA=5.936e+02,paramB=4.814e+02,countA=3,countB=3)
+2026-04-21 02:01:46,113: Snapshot:4	Epoch:1	Loss:2.025	MRR:20.59	Hits@10:34.88	Best:20.59	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.452e-04,gradB=2.392e-04,paramA=6.656e+02,paramB=5.107e+02,countA=3,countB=3)
+2026-04-21 02:01:53,995: Snapshot:4	Epoch:2	Loss:1.529	MRR:21.61	Hits@10:37.77	Best:21.61	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.047e-04,gradB=2.322e-04,paramA=7.194e+02,paramB=5.337e+02,countA=3,countB=3)
+2026-04-21 02:02:02,001: Snapshot:4	Epoch:3	Loss:1.315	MRR:21.95	Hits@10:38.5	Best:21.95	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.151e-04,gradB=2.247e-04,paramA=7.687e+02,paramB=5.554e+02,countA=3,countB=3)
+2026-04-21 02:02:11,438: Snapshot:4	Epoch:4	Loss:1.208	MRR:22.34	Hits@10:39.29	Best:22.34	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.783e-04,gradB=2.273e-04,paramA=8.172e+02,paramB=5.778e+02,countA=3,countB=3)
+2026-04-21 02:02:19,314: Snapshot:4	Epoch:5	Loss:1.124	MRR:22.49	Hits@10:40.38	Best:22.49	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.319e-04,gradB=2.221e-04,paramA=8.628e+02,paramB=5.989e+02,countA=3,countB=3)
+2026-04-21 02:02:27,325: Snapshot:4	Epoch:6	Loss:1.07	MRR:22.88	Hits@10:40.28	Best:22.88	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.010e-04,gradB=2.184e-04,paramA=9.073e+02,paramB=6.194e+02,countA=3,countB=3)
+2026-04-21 02:02:35,427: Snapshot:4	Epoch:7	Loss:1.025	MRR:23.14	Hits@10:40.86	Best:23.14	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.679e-04,gradB=2.134e-04,paramA=9.493e+02,paramB=6.383e+02,countA=3,countB=3)
+2026-04-21 02:02:44,893: Snapshot:4	Epoch:8	Loss:0.992	MRR:23.12	Hits@10:40.83	Best:23.14	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.436e-04,gradB=2.106e-04,paramA=9.902e+02,paramB=6.575e+02,countA=3,countB=3)
+2026-04-21 02:02:52,861: Snapshot:4	Epoch:9	Loss:0.962	MRR:23.06	Hits@10:40.77	Best:23.14	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.205e-04,gradB=2.076e-04,paramA=1.028e+03,paramB=6.756e+02,countA=3,countB=3)
+2026-04-21 02:03:00,723: Snapshot:4	Epoch:10	Loss:0.943	MRR:23.4	Hits@10:40.76	Best:23.4	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.920e-04,gradB=2.020e-04,paramA=1.065e+03,paramB=6.933e+02,countA=3,countB=3)
+2026-04-21 02:03:08,780: Snapshot:4	Epoch:11	Loss:0.905	MRR:23.04	Hits@10:41.18	Best:23.4	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.742e-04,gradB=1.967e-04,paramA=1.101e+03,paramB=7.105e+02,countA=3,countB=3)
+2026-04-21 02:03:18,278: Snapshot:4	Epoch:12	Loss:0.883	MRR:22.98	Hits@10:41.55	Best:23.4	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.633e-04,gradB=1.947e-04,paramA=1.136e+03,paramB=7.274e+02,countA=3,countB=3)
+2026-04-21 02:03:26,360: Early Stopping! Snapshot:4 Epoch: 13 Best Results: 23.4
+2026-04-21 02:03:26,445: => loading checkpoint './checkpoint/ENTITY/4model_best.tar'
+2026-04-21 02:03:58,106: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
+|     2      | 0.2033 | 0.1201 | 0.2274 | 0.2827 |  0.3644 |
+|     3      | 0.193  | 0.1145 | 0.2134 | 0.2675 |  0.3478 |
+|     4      | 0.2322 | 0.136  | 0.2723 | 0.3328 |  0.4133 |
++------------+--------+--------+--------+--------+---------+
+2026-04-21 02:03:58,107: Final Result:
+[+------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
+|     2      | 0.2033 | 0.1201 | 0.2274 | 0.2827 |  0.3644 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
+|     2      | 0.2033 | 0.1201 | 0.2274 | 0.2827 |  0.3644 |
+|     3      | 0.193  | 0.1145 | 0.2134 | 0.2675 |  0.3478 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.3318 | 0.2138 | 0.3849 | 0.4558 |  0.557  |
+|     1      | 0.2297 | 0.1395 | 0.254  | 0.3164 |  0.4074 |
+|     2      | 0.2033 | 0.1201 | 0.2274 | 0.2827 |  0.3644 |
+|     3      | 0.193  | 0.1145 | 0.2134 | 0.2675 |  0.3478 |
+|     4      | 0.2322 | 0.136  | 0.2723 | 0.3328 |  0.4133 |
++------------+--------+--------+--------+--------+---------+]
+2026-04-21 02:03:58,107: Report Result:
++----------+--------------------+-----------+--------------+--------------+---------------+
+| Snapshot |        Time        | Whole_MRR | Whole_Hits@1 | Whole_Hits@3 | Whole_Hits@10 |
++----------+--------------------+-----------+--------------+--------------+---------------+
+|    0     | 30.859532594680786 |   0.332   |    0.214     |    0.385     |     0.557     |
+|    1     | 218.50530314445496 |    0.27   |    0.169     |    0.305     |     0.466     |
+|    2     | 225.4742877483368  |   0.244   |     0.15     |    0.275     |     0.427     |
+|    3     | 213.21144151687622 |    0.23   |     0.14     |    0.259     |     0.406     |
+|    4     | 119.8312520980835  |   0.231   |     0.14     |    0.261     |     0.407     |
++----------+--------------------+-----------+--------------+--------------+---------------+
+2026-04-21 02:03:58,107: Sum_Training_Time:807.8818171024323
+2026-04-21 02:03:58,107: Every_Training_Time:[30.859532594680786, 218.50530314445496, 225.4742877483368, 213.21144151687622, 119.8312520980835]
+2026-04-21 02:03:58,107: Forward transfer: 0.038875 Backward transfer: 0.0
+2026-04-21 02:03:58,223: Loss curve saved to: ./logs/20260421014829/ENTITY/loss_curve.png
+2026-04-21 02:04:07,464: Namespace(save_path='./checkpoint/FACT', log_path='./logs/20260421020400/FACT', data_path='./data/FACT/', random_seed=3407, dataset='FACT', gpu='0', model_name='LoraKGE_Layers', batch_size=1024, learning_rate='1e-1', epoch_num=200, note='', snapshot_num=5, emb_dim=200, margin=8.0, neg_ratio=10, l2=0.0, num_layer=1, skip_previous='False', train_new=True, valid_metrics='mrr', patience=3, debug=False, record=False, predict_result=False, r=100, ent_r='150', rel_r='20', r_fixed=True, using_multi_layers=False, multi_layers_path='train_sorted_by_edges_betweenness.txt', num_ent_layers='2', num_rel_layers='1', using_various_ranks='True', using_various_ranks_reverse=False, explore=False, lora_init='xavier', use_rs_lora=False, log_lora_stats=True, loraplus_ratio=1.0, lora_wd_a=0.0, lora_wd_b=0.0, lora_grad_clip=0.0, use_lr_scheduler=False, warmup_epochs=5, min_lr_ratio=0.1, scheduler_lora_snapshots=False, logger=<RootLogger root (INFO)>, device=device(type='cuda', index=0))
+Start training =============================
+2026-04-21 02:04:18,658: Snapshot:0	Epoch:0	Loss:44.371	MRR:10.9	Hits@10:21.73	Best:10.9	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:04:27,885: Snapshot:0	Epoch:1	Loss:26.676	MRR:16.33	Hits@10:30.98	Best:16.33	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:04:35,931: Snapshot:0	Epoch:2	Loss:15.822	MRR:20.8	Hits@10:35.75	Best:20.8	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:04:43,971: Snapshot:0	Epoch:3	Loss:9.108	MRR:23.21	Hits@10:37.98	Best:23.21	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:04:52,019: Snapshot:0	Epoch:4	Loss:5.307	MRR:24.13	Hits@10:38.83	Best:24.13	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:01,427: Snapshot:0	Epoch:5	Loss:3.292	MRR:24.59	Hits@10:39.28	Best:24.59	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:09,553: Snapshot:0	Epoch:6	Loss:2.23	MRR:24.68	Hits@10:39.59	Best:24.68	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:17,571: Snapshot:0	Epoch:7	Loss:1.66	MRR:24.87	Hits@10:40.01	Best:24.87	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:25,685: Snapshot:0	Epoch:8	Loss:1.318	MRR:24.9	Hits@10:39.83	Best:24.9	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:34,928: Snapshot:0	Epoch:9	Loss:1.105	MRR:24.83	Hits@10:40.07	Best:24.9	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:43,048: Snapshot:0	Epoch:10	Loss:0.939	MRR:24.84	Hits@10:39.86	Best:24.9	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:05:51,204: Early Stopping! Snapshot:0 Epoch: 11 Best Results: 24.9
+2026-04-21 02:05:51,369: => loading checkpoint './checkpoint/FACT/0model_best.tar'
+2026-04-21 02:05:57,799: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:06:18,673: Snapshot:1	Epoch:0	Loss:19.077	MRR:18.22	Hits@10:29.57	Best:18.22	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.309e-03,gradB=3.504e-04,paramA=5.363e+02,paramB=4.124e+02,countA=3,countB=3)
+2026-04-21 02:06:28,433: Snapshot:1	Epoch:1	Loss:16.125	MRR:18.74	Hits@10:30.33	Best:18.74	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.856e-04,gradB=2.681e-04,paramA=6.489e+02,paramB=4.708e+02,countA=3,countB=3)
+2026-04-21 02:06:39,301: Snapshot:1	Epoch:2	Loss:15.473	MRR:19.1	Hits@10:30.84	Best:19.1	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.926e-04,gradB=2.676e-04,paramA=7.382e+02,paramB=5.205e+02,countA=3,countB=3)
+2026-04-21 02:06:49,058: Snapshot:1	Epoch:3	Loss:15.187	MRR:19.18	Hits@10:31.22	Best:19.18	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.289e-04,gradB=2.552e-04,paramA=8.137e+02,paramB=5.617e+02,countA=3,countB=3)
+2026-04-21 02:06:58,782: Snapshot:1	Epoch:4	Loss:15.07	MRR:19.2	Hits@10:31.23	Best:19.2	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.853e-04,gradB=2.437e-04,paramA=8.791e+02,paramB=5.973e+02,countA=3,countB=3)
+2026-04-21 02:07:08,529: Snapshot:1	Epoch:5	Loss:14.97	MRR:19.32	Hits@10:31.6	Best:19.32	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.494e-04,gradB=2.329e-04,paramA=9.387e+02,paramB=6.290e+02,countA=3,countB=3)
+2026-04-21 02:07:19,270: Snapshot:1	Epoch:6	Loss:14.864	MRR:19.33	Hits@10:31.48	Best:19.33	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.169e-04,gradB=2.213e-04,paramA=9.926e+02,paramB=6.573e+02,countA=3,countB=3)
+2026-04-21 02:07:29,053: Snapshot:1	Epoch:7	Loss:14.814	MRR:19.36	Hits@10:31.62	Best:19.36	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.968e-04,gradB=2.147e-04,paramA=1.043e+03,paramB=6.833e+02,countA=3,countB=3)
+2026-04-21 02:07:38,786: Snapshot:1	Epoch:8	Loss:14.764	MRR:19.4	Hits@10:31.66	Best:19.4	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.744e-04,gradB=2.052e-04,paramA=1.091e+03,paramB=7.081e+02,countA=3,countB=3)
+2026-04-21 02:07:49,572: Snapshot:1	Epoch:9	Loss:14.731	MRR:19.46	Hits@10:31.72	Best:19.46	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.553e-04,gradB=1.982e-04,paramA=1.136e+03,paramB=7.309e+02,countA=3,countB=3)
+2026-04-21 02:07:59,643: Snapshot:1	Epoch:10	Loss:14.7	MRR:19.47	Hits@10:31.7	Best:19.47	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.408e-04,gradB=1.932e-04,paramA=1.179e+03,paramB=7.527e+02,countA=3,countB=3)
+2026-04-21 02:08:09,400: Snapshot:1	Epoch:11	Loss:14.7	MRR:19.46	Hits@10:31.79	Best:19.47	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.286e-04,gradB=1.881e-04,paramA=1.221e+03,paramB=7.736e+02,countA=3,countB=3)
+2026-04-21 02:08:20,279: Snapshot:1	Epoch:12	Loss:14.683	MRR:19.51	Hits@10:31.88	Best:19.51	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.165e-04,gradB=1.829e-04,paramA=1.261e+03,paramB=7.934e+02,countA=3,countB=3)
+2026-04-21 02:08:30,107: Snapshot:1	Epoch:13	Loss:14.642	MRR:19.52	Hits@10:31.83	Best:19.52	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.054e-04,gradB=1.781e-04,paramA=1.300e+03,paramB=8.129e+02,countA=3,countB=3)
+2026-04-21 02:08:39,905: Snapshot:1	Epoch:14	Loss:14.653	MRR:19.52	Hits@10:31.89	Best:19.52	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.952e-04,gradB=1.735e-04,paramA=1.338e+03,paramB=8.314e+02,countA=3,countB=3)
+2026-04-21 02:08:49,655: Snapshot:1	Epoch:15	Loss:14.609	MRR:19.51	Hits@10:31.92	Best:19.52	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.843e-04,gradB=1.688e-04,paramA=1.376e+03,paramB=8.496e+02,countA=3,countB=3)
+2026-04-21 02:09:00,513: Early Stopping! Snapshot:1 Epoch: 16 Best Results: 19.52
+2026-04-21 02:09:00,636: => loading checkpoint './checkpoint/FACT/1model_best.tar'
+2026-04-21 02:09:14,796: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:09:36,181: Snapshot:2	Epoch:0	Loss:17.67	MRR:16.75	Hits@10:28.6	Best:16.75	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.476e-04,gradB=1.874e-04,paramA=3.352e+02,paramB=4.210e+02,countA=3,countB=3)
+2026-04-21 02:09:46,102: Snapshot:2	Epoch:1	Loss:16.537	MRR:16.9	Hits@10:28.73	Best:16.9	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.428e-04,gradB=1.358e-04,paramA=4.030e+02,paramB=4.734e+02,countA=3,countB=3)
+2026-04-21 02:09:56,043: Snapshot:2	Epoch:2	Loss:16.377	MRR:16.96	Hits@10:28.88	Best:16.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.975e-04,gradB=1.319e-04,paramA=4.553e+02,paramB=5.170e+02,countA=3,countB=3)
+2026-04-21 02:10:06,002: Snapshot:2	Epoch:3	Loss:16.321	MRR:17.0	Hits@10:28.94	Best:17.0	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.635e-04,gradB=1.241e-04,paramA=4.995e+02,paramB=5.546e+02,countA=3,countB=3)
+2026-04-21 02:10:17,522: Snapshot:2	Epoch:4	Loss:16.236	MRR:16.99	Hits@10:28.82	Best:17.0	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.379e-04,gradB=1.162e-04,paramA=5.374e+02,paramB=5.863e+02,countA=3,countB=3)
+2026-04-21 02:10:27,529: Snapshot:2	Epoch:5	Loss:16.204	MRR:17.04	Hits@10:28.97	Best:17.04	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.243e-04,gradB=1.127e-04,paramA=5.725e+02,paramB=6.157e+02,countA=3,countB=3)
+2026-04-21 02:10:37,417: Snapshot:2	Epoch:6	Loss:16.158	MRR:17.06	Hits@10:28.99	Best:17.06	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.096e-04,gradB=1.081e-04,paramA=6.046e+02,paramB=6.424e+02,countA=3,countB=3)
+2026-04-21 02:10:47,378: Snapshot:2	Epoch:7	Loss:16.168	MRR:17.07	Hits@10:29.05	Best:17.07	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.990e-04,gradB=1.044e-04,paramA=6.346e+02,paramB=6.676e+02,countA=3,countB=3)
+2026-04-21 02:10:58,525: Snapshot:2	Epoch:8	Loss:16.151	MRR:17.04	Hits@10:28.99	Best:17.07	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.903e-04,gradB=1.016e-04,paramA=6.626e+02,paramB=6.907e+02,countA=3,countB=3)
+2026-04-21 02:11:08,658: Snapshot:2	Epoch:9	Loss:16.147	MRR:17.07	Hits@10:29.0	Best:17.07	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.787e-04,gradB=9.700e-05,paramA=6.902e+02,paramB=7.134e+02,countA=3,countB=3)
+2026-04-21 02:11:18,774: Early Stopping! Snapshot:2 Epoch: 10 Best Results: 17.07
+2026-04-21 02:11:18,877: => loading checkpoint './checkpoint/FACT/2model_best.tar'
+2026-04-21 02:11:43,062: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
+|     2      | 0.1719 | 0.1077 | 0.1971 | 0.2354 |  0.2906 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:12:04,532: Snapshot:3	Epoch:0	Loss:17.283	MRR:14.12	Hits@10:25.38	Best:14.12	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.244e-04,gradB=9.918e-05,paramA=2.201e+02,paramB=4.283e+02,countA=3,countB=3)
+2026-04-21 02:12:14,569: Snapshot:3	Epoch:1	Loss:16.862	MRR:14.17	Hits@10:25.52	Best:14.17	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.707e-04,gradB=6.941e-05,paramA=2.620e+02,paramB=4.746e+02,countA=3,countB=3)
+2026-04-21 02:12:24,647: Snapshot:3	Epoch:2	Loss:16.814	MRR:14.19	Hits@10:25.59	Best:14.19	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.467e-04,gradB=6.433e-05,paramA=2.952e+02,paramB=5.136e+02,countA=3,countB=3)
+2026-04-21 02:12:35,951: Snapshot:3	Epoch:3	Loss:16.781	MRR:14.21	Hits@10:25.55	Best:14.21	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.301e-04,gradB=6.025e-05,paramA=3.228e+02,paramB=5.466e+02,countA=3,countB=3)
+2026-04-21 02:12:46,176: Snapshot:3	Epoch:4	Loss:16.768	MRR:14.2	Hits@10:25.56	Best:14.21	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.196e-04,gradB=5.699e-05,paramA=3.463e+02,paramB=5.760e+02,countA=3,countB=3)
+2026-04-21 02:12:56,135: Snapshot:3	Epoch:5	Loss:16.759	MRR:14.23	Hits@10:25.63	Best:14.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.103e-04,gradB=5.418e-05,paramA=3.689e+02,paramB=6.038e+02,countA=3,countB=3)
+2026-04-21 02:13:07,230: Snapshot:3	Epoch:6	Loss:16.735	MRR:14.19	Hits@10:25.6	Best:14.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.980e-05,gradB=5.017e-05,paramA=3.880e+02,paramB=6.282e+02,countA=3,countB=3)
+2026-04-21 02:13:17,472: Snapshot:3	Epoch:7	Loss:16.737	MRR:14.2	Hits@10:25.59	Best:14.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.916e-05,gradB=5.000e-05,paramA=4.074e+02,paramB=6.517e+02,countA=3,countB=3)
+2026-04-21 02:13:27,432: Early Stopping! Snapshot:3 Epoch: 8 Best Results: 14.23
+2026-04-21 02:13:27,508: => loading checkpoint './checkpoint/FACT/3model_best.tar'
+2026-04-21 02:13:58,373: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
+|     2      | 0.1719 | 0.1077 | 0.1971 | 0.2354 |  0.2906 |
+|     3      | 0.1454 | 0.0838 | 0.1655 | 0.2039 |   0.26  |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:14:20,645: Snapshot:4	Epoch:0	Loss:16.874	MRR:10.74	Hits@10:20.44	Best:10.74	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.906e-04,gradB=1.084e-04,paramA=2.892e+02,paramB=4.352e+02,countA=3,countB=3)
+2026-04-21 02:14:30,889: Snapshot:4	Epoch:1	Loss:16.23	MRR:10.82	Hits@10:20.54	Best:10.82	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.762e-04,gradB=5.643e-05,paramA=3.328e+02,paramB=4.682e+02,countA=3,countB=3)
+2026-04-21 02:14:41,100: Snapshot:4	Epoch:2	Loss:16.169	MRR:10.79	Hits@10:20.64	Best:10.82	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.479e-04,gradB=5.031e-05,paramA=3.668e+02,paramB=4.958e+02,countA=3,countB=3)
+2026-04-21 02:14:52,443: Snapshot:4	Epoch:3	Loss:16.156	MRR:10.81	Hits@10:20.6	Best:10.82	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.321e-04,gradB=4.750e-05,paramA=3.965e+02,paramB=5.208e+02,countA=3,countB=3)
+2026-04-21 02:15:02,708: Snapshot:4	Epoch:4	Loss:16.139	MRR:10.85	Hits@10:20.52	Best:10.85	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.218e-04,gradB=4.550e-05,paramA=4.247e+02,paramB=5.451e+02,countA=3,countB=3)
+2026-04-21 02:15:13,036: Snapshot:4	Epoch:5	Loss:16.129	MRR:10.82	Hits@10:20.61	Best:10.85	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.093e-04,gradB=4.255e-05,paramA=4.505e+02,paramB=5.684e+02,countA=3,countB=3)
+2026-04-21 02:15:24,547: Snapshot:4	Epoch:6	Loss:16.132	MRR:10.84	Hits@10:20.55	Best:10.85	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.072e-04,gradB=4.193e-05,paramA=4.754e+02,paramB=5.903e+02,countA=3,countB=3)
+2026-04-21 02:15:34,780: Early Stopping! Snapshot:4 Epoch: 7 Best Results: 10.85
+2026-04-21 02:15:34,872: => loading checkpoint './checkpoint/FACT/4model_best.tar'
+2026-04-21 02:16:14,440: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
+|     2      | 0.1719 | 0.1077 | 0.1971 | 0.2354 |  0.2906 |
+|     3      | 0.1454 | 0.0838 | 0.1655 | 0.2039 |   0.26  |
+|     4      | 0.1088 | 0.0546 | 0.1197 | 0.1539 |  0.2065 |
++------------+--------+--------+--------+--------+---------+
+2026-04-21 02:16:14,441: Final Result:
+[+------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
+|     2      | 0.1719 | 0.1077 | 0.1971 | 0.2354 |  0.2906 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
+|     2      | 0.1719 | 0.1077 | 0.1971 | 0.2354 |  0.2906 |
+|     3      | 0.1454 | 0.0838 | 0.1655 | 0.2039 |   0.26  |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2421 | 0.1597 | 0.2821 | 0.3308 |  0.3906 |
+|     1      | 0.1947 | 0.1256 | 0.2284 | 0.268  |  0.3175 |
+|     2      | 0.1719 | 0.1077 | 0.1971 | 0.2354 |  0.2906 |
+|     3      | 0.1454 | 0.0838 | 0.1655 | 0.2039 |   0.26  |
+|     4      | 0.1088 | 0.0546 | 0.1197 | 0.1539 |  0.2065 |
++------------+--------+--------+--------+--------+---------+]
+2026-04-21 02:16:14,441: Report Result:
++----------+--------------------+-----------+--------------+--------------+---------------+
+| Snapshot |        Time        | Whole_MRR | Whole_Hits@1 | Whole_Hits@3 | Whole_Hits@10 |
++----------+--------------------+-----------+--------------+--------------+---------------+
+|    0     | 103.73991346359253 |   0.242   |     0.16     |    0.282     |     0.391     |
+|    1     | 174.0859661102295  |   0.218   |    0.143     |    0.255     |     0.354     |
+|    2     | 116.06617665290833 |   0.203   |    0.131     |    0.236     |     0.333     |
+|    3     |  96.5987000465393  |   0.189   |    0.119     |    0.218     |     0.315     |
+|    4     | 88.12232565879822  |   0.173   |    0.106     |    0.199     |     0.293     |
++----------+--------------------+-----------+--------------+--------------+---------------+
+2026-04-21 02:16:14,441: Sum_Training_Time:578.6130819320679
+2026-04-21 02:16:14,441: Every_Training_Time:[103.73991346359253, 174.0859661102295, 116.06617665290833, 96.5987000465393, 88.12232565879822]
+2026-04-21 02:16:14,441: Forward transfer: 0.14152499999999998 Backward transfer: 0.0
+2026-04-21 02:16:14,553: Loss curve saved to: ./logs/20260421020400/FACT/loss_curve.png
+2026-04-21 02:16:22,563: Namespace(save_path='./checkpoint/HYBRID', log_path='./logs/20260421021616/HYBRID', data_path='./data/HYBRID/', random_seed=3407, dataset='HYBRID', gpu='0', model_name='LoraKGE_Layers', batch_size=1024, learning_rate='1e-1', epoch_num=200, note='', snapshot_num=5, emb_dim=200, margin=8.0, neg_ratio=10, l2=0.0, num_layer=1, skip_previous='False', train_new=True, valid_metrics='mrr', patience=3, debug=False, record=False, predict_result=False, r=100, ent_r='150', rel_r='20', r_fixed=True, using_multi_layers=False, multi_layers_path='train_sorted_by_edges_betweenness.txt', num_ent_layers='2', num_rel_layers='1', using_various_ranks='True', using_various_ranks_reverse=False, explore=False, lora_init='xavier', use_rs_lora=False, log_lora_stats=True, loraplus_ratio=1.0, lora_wd_a=0.0, lora_wd_b=0.0, lora_grad_clip=0.0, use_lr_scheduler=False, warmup_epochs=5, min_lr_ratio=0.1, scheduler_lora_snapshots=False, logger=<RootLogger root (INFO)>, device=device(type='cuda', index=0))
+Start training =============================
+2026-04-21 02:16:34,131: Snapshot:0	Epoch:0	Loss:37.254	MRR:14.77	Hits@10:28.74	Best:14.77	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:16:41,314: Snapshot:0	Epoch:1	Loss:18.688	MRR:22.5	Hits@10:40.51	Best:22.5	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:16:48,392: Snapshot:0	Epoch:2	Loss:8.75	MRR:24.99	Hits@10:44.12	Best:24.99	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:16:55,428: Snapshot:0	Epoch:3	Loss:4.573	MRR:25.58	Hits@10:45.32	Best:25.58	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:17:03,695: Snapshot:0	Epoch:4	Loss:2.786	MRR:25.68	Hits@10:45.1	Best:25.68	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:17:10,731: Snapshot:0	Epoch:5	Loss:1.939	MRR:25.47	Hits@10:45.19	Best:25.68	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:17:17,623: Snapshot:0	Epoch:6	Loss:1.502	MRR:25.11	Hits@10:44.92	Best:25.68	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:17:24,579: Early Stopping! Snapshot:0 Epoch: 7 Best Results: 25.68
+2026-04-21 02:17:24,677: => loading checkpoint './checkpoint/HYBRID/0model_best.tar'
+2026-04-21 02:17:30,187: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:17:39,008: Snapshot:1	Epoch:0	Loss:7.579	MRR:20.24	Hits@10:34.71	Best:20.24	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.119e-03,gradB=1.239e-03,paramA=3.589e+02,paramB=4.376e+02,countA=3,countB=3)
+2026-04-21 02:17:41,964: Snapshot:1	Epoch:1	Loss:3.461	MRR:24.05	Hits@10:41.92	Best:24.05	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.703e-03,gradB=7.076e-04,paramA=4.479e+02,paramB=4.992e+02,countA=3,countB=3)
+2026-04-21 02:17:44,941: Snapshot:1	Epoch:2	Loss:2.873	MRR:24.65	Hits@10:43.74	Best:24.65	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.408e-03,gradB=6.211e-04,paramA=4.855e+02,paramB=5.252e+02,countA=3,countB=3)
+2026-04-21 02:17:47,866: Snapshot:1	Epoch:3	Loss:2.613	MRR:25.26	Hits@10:45.04	Best:25.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.308e-03,gradB=6.069e-04,paramA=5.136e+02,paramB=5.444e+02,countA=3,countB=3)
+2026-04-21 02:17:50,778: Snapshot:1	Epoch:4	Loss:2.462	MRR:25.82	Hits@10:45.07	Best:25.82	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.239e-03,gradB=5.952e-04,paramA=5.390e+02,paramB=5.615e+02,countA=3,countB=3)
+2026-04-21 02:17:53,717: Snapshot:1	Epoch:5	Loss:2.357	MRR:26.11	Hits@10:45.9	Best:26.11	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.200e-03,gradB=5.865e-04,paramA=5.625e+02,paramB=5.769e+02,countA=3,countB=3)
+2026-04-21 02:17:56,640: Snapshot:1	Epoch:6	Loss:2.296	MRR:26.08	Hits@10:45.93	Best:26.11	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.126e-03,gradB=5.748e-04,paramA=5.846e+02,paramB=5.911e+02,countA=3,countB=3)
+2026-04-21 02:17:59,608: Snapshot:1	Epoch:7	Loss:2.25	MRR:26.06	Hits@10:46.02	Best:26.11	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.099e-03,gradB=5.718e-04,paramA=6.055e+02,paramB=6.044e+02,countA=3,countB=3)
+2026-04-21 02:18:02,510: Early Stopping! Snapshot:1 Epoch: 8 Best Results: 26.11
+2026-04-21 02:18:02,576: => loading checkpoint './checkpoint/HYBRID/1model_best.tar'
+2026-04-21 02:18:11,810: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:18:38,569: Snapshot:2	Epoch:0	Loss:23.461	MRR:14.76	Hits@10:27.34	Best:14.76	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.000e-03,gradB=9.907e-04,paramA=6.802e+02,paramB=5.152e+02,countA=3,countB=3)
+2026-04-21 02:18:53,925: Snapshot:2	Epoch:1	Loss:14.917	MRR:16.03	Hits@10:29.41	Best:16.03	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.666e-03,gradB=6.946e-04,paramA=8.215e+02,paramB=5.808e+02,countA=3,countB=3)
+2026-04-21 02:19:07,935: Snapshot:2	Epoch:2	Loss:13.775	MRR:16.7	Hits@10:30.4	Best:16.7	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.421e-03,gradB=6.465e-04,paramA=9.428e+02,paramB=6.389e+02,countA=3,countB=3)
+2026-04-21 02:19:23,252: Snapshot:2	Epoch:3	Loss:13.239	MRR:17.35	Hits@10:31.21	Best:17.35	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.253e-03,gradB=6.069e-04,paramA=1.051e+03,paramB=6.902e+02,countA=3,countB=3)
+2026-04-21 02:19:37,446: Snapshot:2	Epoch:4	Loss:12.889	MRR:17.46	Hits@10:31.57	Best:17.46	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.166e-03,gradB=5.784e-04,paramA=1.149e+03,paramB=7.366e+02,countA=3,countB=3)
+2026-04-21 02:19:53,048: Snapshot:2	Epoch:5	Loss:12.674	MRR:17.99	Hits@10:32.25	Best:17.99	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.069e-03,gradB=5.511e-04,paramA=1.238e+03,paramB=7.790e+02,countA=3,countB=3)
+2026-04-21 02:20:06,969: Snapshot:2	Epoch:6	Loss:12.489	MRR:17.9	Hits@10:32.11	Best:17.99	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.969e-04,gradB=5.264e-04,paramA=1.320e+03,paramB=8.178e+02,countA=3,countB=3)
+2026-04-21 02:20:21,041: Snapshot:2	Epoch:7	Loss:12.344	MRR:18.05	Hits@10:32.26	Best:18.05	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.523e-04,gradB=5.080e-04,paramA=1.399e+03,paramB=8.544e+02,countA=3,countB=3)
+2026-04-21 02:20:36,361: Snapshot:2	Epoch:8	Loss:12.252	MRR:17.87	Hits@10:32.65	Best:18.05	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.047e-04,gradB=4.898e-04,paramA=1.472e+03,paramB=8.882e+02,countA=3,countB=3)
+2026-04-21 02:20:50,506: Snapshot:2	Epoch:9	Loss:12.194	MRR:18.42	Hits@10:32.63	Best:18.42	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.589e-04,gradB=4.734e-04,paramA=1.542e+03,paramB=9.205e+02,countA=3,countB=3)
+2026-04-21 02:21:05,924: Snapshot:2	Epoch:10	Loss:12.136	MRR:18.31	Hits@10:32.89	Best:18.42	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.369e-04,gradB=4.607e-04,paramA=1.610e+03,paramB=9.517e+02,countA=3,countB=3)
+2026-04-21 02:21:19,896: Snapshot:2	Epoch:11	Loss:12.072	MRR:18.45	Hits@10:33.05	Best:18.45	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.967e-04,gradB=4.441e-04,paramA=1.675e+03,paramB=9.816e+02,countA=3,countB=3)
+2026-04-21 02:21:35,376: Snapshot:2	Epoch:12	Loss:11.963	MRR:18.29	Hits@10:32.67	Best:18.45	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.694e-04,gradB=4.329e-04,paramA=1.737e+03,paramB=1.009e+03,countA=3,countB=3)
+2026-04-21 02:21:49,225: Snapshot:2	Epoch:13	Loss:11.949	MRR:18.46	Hits@10:33.05	Best:18.46	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.431e-04,gradB=4.220e-04,paramA=1.800e+03,paramB=1.037e+03,countA=3,countB=3)
+2026-04-21 02:22:04,644: Snapshot:2	Epoch:14	Loss:11.891	MRR:18.3	Hits@10:32.9	Best:18.46	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.197e-04,gradB=4.136e-04,paramA=1.860e+03,paramB=1.063e+03,countA=3,countB=3)
+2026-04-21 02:22:18,459: Snapshot:2	Epoch:15	Loss:11.892	MRR:18.52	Hits@10:32.94	Best:18.52	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.008e-04,gradB=4.035e-04,paramA=1.919e+03,paramB=1.089e+03,countA=3,countB=3)
+2026-04-21 02:22:32,444: Snapshot:2	Epoch:16	Loss:11.832	MRR:18.59	Hits@10:32.96	Best:18.59	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.808e-04,gradB=3.941e-04,paramA=1.976e+03,paramB=1.114e+03,countA=3,countB=3)
+2026-04-21 02:22:47,747: Snapshot:2	Epoch:17	Loss:11.81	MRR:18.5	Hits@10:33.0	Best:18.59	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.621e-04,gradB=3.860e-04,paramA=2.033e+03,paramB=1.139e+03,countA=3,countB=3)
+2026-04-21 02:23:01,947: Snapshot:2	Epoch:18	Loss:11.753	MRR:18.71	Hits@10:32.97	Best:18.71	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.410e-04,gradB=3.768e-04,paramA=2.088e+03,paramB=1.163e+03,countA=3,countB=3)
+2026-04-21 02:23:17,245: Snapshot:2	Epoch:19	Loss:11.724	MRR:18.71	Hits@10:33.09	Best:18.71	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.270e-04,gradB=3.701e-04,paramA=2.143e+03,paramB=1.186e+03,countA=3,countB=3)
+2026-04-21 02:23:31,289: Snapshot:2	Epoch:20	Loss:11.752	MRR:18.51	Hits@10:33.1	Best:18.71	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.109e-04,gradB=3.636e-04,paramA=2.197e+03,paramB=1.209e+03,countA=3,countB=3)
+2026-04-21 02:23:46,525: Snapshot:2	Epoch:21	Loss:11.703	MRR:18.73	Hits@10:33.33	Best:18.73	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.971e-04,gradB=3.556e-04,paramA=2.250e+03,paramB=1.231e+03,countA=3,countB=3)
+2026-04-21 02:24:00,577: Snapshot:2	Epoch:22	Loss:11.706	MRR:18.74	Hits@10:33.2	Best:18.74	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.880e-04,gradB=3.502e-04,paramA=2.302e+03,paramB=1.254e+03,countA=3,countB=3)
+2026-04-21 02:24:14,555: Snapshot:2	Epoch:23	Loss:11.717	MRR:18.7	Hits@10:33.11	Best:18.74	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.722e-04,gradB=3.435e-04,paramA=2.355e+03,paramB=1.276e+03,countA=3,countB=3)
+2026-04-21 02:24:29,748: Snapshot:2	Epoch:24	Loss:11.677	MRR:18.62	Hits@10:33.41	Best:18.74	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.614e-04,gradB=3.390e-04,paramA=2.407e+03,paramB=1.297e+03,countA=3,countB=3)
+2026-04-21 02:24:43,945: Early Stopping! Snapshot:2 Epoch: 25 Best Results: 18.74
+2026-04-21 02:24:44,045: => loading checkpoint './checkpoint/HYBRID/2model_best.tar'
+2026-04-21 02:25:03,871: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
+|     2      | 0.1856 | 0.1127 | 0.2077 | 0.2576 |  0.3292 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:25:37,783: Snapshot:3	Epoch:0	Loss:26.649	MRR:14.83	Hits@10:27.89	Best:14.83	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.040e-03,gradB=1.069e-03,paramA=5.647e+02,paramB=5.315e+02,countA=3,countB=3)
+2026-04-21 02:25:54,876: Snapshot:3	Epoch:1	Loss:19.268	MRR:15.8	Hits@10:29.54	Best:15.8	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.030e-03,gradB=7.453e-04,paramA=6.942e+02,paramB=6.065e+02,countA=3,countB=3)
+2026-04-21 02:26:13,362: Snapshot:3	Epoch:2	Loss:18.416	MRR:16.12	Hits@10:30.39	Best:16.12	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.602e-03,gradB=6.774e-04,paramA=8.023e+02,paramB=6.694e+02,countA=3,countB=3)
+2026-04-21 02:26:30,523: Snapshot:3	Epoch:3	Loss:18.043	MRR:16.46	Hits@10:30.58	Best:16.46	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.374e-03,gradB=6.269e-04,paramA=8.965e+02,paramB=7.258e+02,countA=3,countB=3)
+2026-04-21 02:26:48,962: Snapshot:3	Epoch:4	Loss:17.795	MRR:16.6	Hits@10:30.77	Best:16.6	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.245e-03,gradB=5.891e-04,paramA=9.815e+02,paramB=7.759e+02,countA=3,countB=3)
+2026-04-21 02:27:07,337: Snapshot:3	Epoch:5	Loss:17.609	MRR:16.96	Hits@10:31.18	Best:16.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.146e-03,gradB=5.579e-04,paramA=1.059e+03,paramB=8.211e+02,countA=3,countB=3)
+2026-04-21 02:27:24,697: Snapshot:3	Epoch:6	Loss:17.429	MRR:16.94	Hits@10:31.11	Best:16.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.088e-03,gradB=5.328e-04,paramA=1.131e+03,paramB=8.633e+02,countA=3,countB=3)
+2026-04-21 02:27:42,993: Snapshot:3	Epoch:7	Loss:17.36	MRR:16.94	Hits@10:31.31	Best:16.96	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.010e-03,gradB=5.095e-04,paramA=1.197e+03,paramB=9.020e+02,countA=3,countB=3)
+2026-04-21 02:28:00,203: Snapshot:3	Epoch:8	Loss:17.309	MRR:17.1	Hits@10:31.22	Best:17.1	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.582e-04,gradB=4.925e-04,paramA=1.262e+03,paramB=9.396e+02,countA=3,countB=3)
+2026-04-21 02:28:18,505: Snapshot:3	Epoch:9	Loss:17.217	MRR:17.23	Hits@10:31.51	Best:17.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.196e-04,gradB=4.745e-04,paramA=1.323e+03,paramB=9.747e+02,countA=3,countB=3)
+2026-04-21 02:28:35,596: Snapshot:3	Epoch:10	Loss:17.143	MRR:17.13	Hits@10:31.42	Best:17.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.827e-04,gradB=4.606e-04,paramA=1.382e+03,paramB=1.008e+03,countA=3,countB=3)
+2026-04-21 02:28:54,042: Snapshot:3	Epoch:11	Loss:17.13	MRR:17.17	Hits@10:31.6	Best:17.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.397e-04,gradB=4.446e-04,paramA=1.439e+03,paramB=1.041e+03,countA=3,countB=3)
+2026-04-21 02:29:11,434: Early Stopping! Snapshot:3 Epoch: 12 Best Results: 17.23
+2026-04-21 02:29:11,529: => loading checkpoint './checkpoint/HYBRID/3model_best.tar'
+2026-04-21 02:29:44,696: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
+|     2      | 0.1856 | 0.1127 | 0.2077 | 0.2576 |  0.3292 |
+|     3      | 0.1713 | 0.0951 | 0.2019 | 0.2533 |  0.3166 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:30:00,227: Snapshot:4	Epoch:0	Loss:14.698	MRR:12.14	Hits@10:21.92	Best:12.14	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.469e-03,gradB=1.389e-03,paramA=1.550e+02,paramB=4.524e+02,countA=3,countB=3)
+2026-04-21 02:30:06,974: Snapshot:4	Epoch:1	Loss:12.051	MRR:12.69	Hits@10:22.79	Best:12.69	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.637e-03,gradB=6.779e-04,paramA=1.883e+02,paramB=4.942e+02,countA=3,countB=3)
+2026-04-21 02:30:13,690: Snapshot:4	Epoch:2	Loss:11.869	MRR:12.9	Hits@10:23.02	Best:12.9	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.480e-03,gradB=6.500e-04,paramA=2.116e+02,paramB=5.241e+02,countA=3,countB=3)
+2026-04-21 02:30:20,421: Snapshot:4	Epoch:3	Loss:11.727	MRR:13.08	Hits@10:23.2	Best:13.08	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.346e-03,gradB=6.321e-04,paramA=2.300e+02,paramB=5.496e+02,countA=3,countB=3)
+2026-04-21 02:30:27,162: Snapshot:4	Epoch:4	Loss:11.673	MRR:13.18	Hits@10:23.25	Best:13.18	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.293e-03,gradB=6.148e-04,paramA=2.460e+02,paramB=5.740e+02,countA=3,countB=3)
+2026-04-21 02:30:35,271: Snapshot:4	Epoch:5	Loss:11.587	MRR:13.23	Hits@10:23.1	Best:13.23	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.206e-03,gradB=5.908e-04,paramA=2.609e+02,paramB=5.963e+02,countA=3,countB=3)
+2026-04-21 02:30:42,044: Snapshot:4	Epoch:6	Loss:11.553	MRR:13.34	Hits@10:23.41	Best:13.34	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.164e-03,gradB=5.716e-04,paramA=2.735e+02,paramB=6.170e+02,countA=3,countB=3)
+2026-04-21 02:30:48,794: Snapshot:4	Epoch:7	Loss:11.559	MRR:13.35	Hits@10:23.27	Best:13.35	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.082e-03,gradB=5.578e-04,paramA=2.855e+02,paramB=6.362e+02,countA=3,countB=3)
+2026-04-21 02:30:55,788: Snapshot:4	Epoch:8	Loss:11.546	MRR:13.26	Hits@10:23.31	Best:13.35	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.040e-03,gradB=5.410e-04,paramA=2.960e+02,paramB=6.526e+02,countA=3,countB=3)
+2026-04-21 02:31:03,709: Snapshot:4	Epoch:9	Loss:11.537	MRR:13.27	Hits@10:23.38	Best:13.35	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.015e-03,gradB=5.227e-04,paramA=3.061e+02,paramB=6.694e+02,countA=3,countB=3)
+2026-04-21 02:31:10,482: Early Stopping! Snapshot:4 Epoch: 10 Best Results: 13.35
+2026-04-21 02:31:10,549: => loading checkpoint './checkpoint/HYBRID/4model_best.tar'
+2026-04-21 02:31:49,337: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
+|     2      | 0.1856 | 0.1127 | 0.2077 | 0.2576 |  0.3292 |
+|     3      | 0.1713 | 0.0951 | 0.2019 | 0.2533 |  0.3166 |
+|     4      | 0.1316 | 0.0808 | 0.1435 | 0.1794 |  0.2316 |
++------------+--------+--------+--------+--------+---------+
+2026-04-21 02:31:49,338: Final Result:
+[+------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
+|     2      | 0.1856 | 0.1127 | 0.2077 | 0.2576 |  0.3292 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
+|     2      | 0.1856 | 0.1127 | 0.2077 | 0.2576 |  0.3292 |
+|     3      | 0.1713 | 0.0951 | 0.2019 | 0.2533 |  0.3166 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2579 | 0.1563 | 0.3101 | 0.3721 |  0.4431 |
+|     1      | 0.2565 | 0.1625 | 0.289  | 0.3595 |  0.4493 |
+|     2      | 0.1856 | 0.1127 | 0.2077 | 0.2576 |  0.3292 |
+|     3      | 0.1713 | 0.0951 | 0.2019 | 0.2533 |  0.3166 |
+|     4      | 0.1316 | 0.0808 | 0.1435 | 0.1794 |  0.2316 |
++------------+--------+--------+--------+--------+---------+]
+2026-04-21 02:31:49,338: Report Result:
++----------+-------------------+-----------+--------------+--------------+---------------+
+| Snapshot |        Time       | Whole_MRR | Whole_Hits@1 | Whole_Hits@3 | Whole_Hits@10 |
++----------+-------------------+-----------+--------------+--------------+---------------+
+|    0     | 62.01564025878906 |   0.258   |    0.156     |     0.31     |     0.443     |
+|    1     | 28.82756519317627 |   0.258   |    0.158     |    0.304     |     0.445     |
+|    2     | 381.7272939682007 |   0.219   |    0.134     |    0.253     |     0.384     |
+|    3     | 234.1846694946289 |   0.201   |    0.119     |    0.234     |     0.358     |
+|    4     | 80.30568885803223 |   0.192   |    0.114     |    0.222     |     0.342     |
++----------+-------------------+-----------+--------------+--------------+---------------+
+2026-04-21 02:31:49,338: Sum_Training_Time:787.0608577728271
+2026-04-21 02:31:49,339: Every_Training_Time:[62.01564025878906, 28.82756519317627, 381.7272939682007, 234.1846694946289, 80.30568885803223]
+2026-04-21 02:31:49,339: Forward transfer: 0.03535 Backward transfer: 0.0
+2026-04-21 02:31:49,454: Loss curve saved to: ./logs/20260421021616/HYBRID/loss_curve.png
+2026-04-21 02:31:58,165: Namespace(save_path='./checkpoint/RELATION', log_path='./logs/20260421023151/RELATION', data_path='./data/RELATION/', random_seed=3407, dataset='RELATION', gpu='0', model_name='LoraKGE_Layers', batch_size=1024, learning_rate='1e-1', epoch_num=200, note='', snapshot_num=5, emb_dim=200, margin=8.0, neg_ratio=10, l2=0.0, num_layer=1, skip_previous='False', train_new=True, valid_metrics='mrr', patience=3, debug=False, record=False, predict_result=False, r=100, ent_r='150', rel_r='20', r_fixed=True, using_multi_layers=False, multi_layers_path='train_sorted_by_edges_betweenness.txt', num_ent_layers='2', num_rel_layers='1', using_various_ranks='True', using_various_ranks_reverse=False, explore=False, lora_init='xavier', use_rs_lora=False, log_lora_stats=True, loraplus_ratio=1.0, lora_wd_a=0.0, lora_wd_b=0.0, lora_grad_clip=0.0, use_lr_scheduler=False, warmup_epochs=5, min_lr_ratio=0.1, scheduler_lora_snapshots=False, logger=<RootLogger root (INFO)>, device=device(type='cuda', index=0))
+Start training =============================
+2026-04-21 02:32:17,565: Snapshot:0	Epoch:0	Loss:57.486	MRR:20.18	Hits@10:35.83	Best:20.18	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:32:31,098: Snapshot:0	Epoch:1	Loss:26.217	MRR:26.2	Hits@10:45.62	Best:26.2	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:32:46,276: Snapshot:0	Epoch:2	Loss:10.94	MRR:27.72	Hits@10:47.3	Best:27.72	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:32:59,917: Snapshot:0	Epoch:3	Loss:5.704	MRR:27.49	Hits@10:47.45	Best:27.72	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:33:13,711: Snapshot:0	Epoch:4	Loss:3.896	MRR:27.38	Hits@10:47.29	Best:27.72	LoRAStats(lrA=1.00e-01,lrB=0.00e+00,gradA=0.000e+00,gradB=0.000e+00,paramA=0.000e+00,paramB=0.000e+00,countA=0,countB=0)
+2026-04-21 02:33:28,785: Early Stopping! Snapshot:0 Epoch: 5 Best Results: 27.72
+2026-04-21 02:33:28,875: => loading checkpoint './checkpoint/RELATION/0model_best.tar'
+2026-04-21 02:33:39,663: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:34:09,991: Snapshot:1	Epoch:0	Loss:32.81	MRR:8.87	Hits@10:18.11	Best:8.87	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.600e-03,gradB=1.156e-03,paramA=5.530e+02,paramB=5.167e+02,countA=3,countB=3)
+2026-04-21 02:34:26,342: Snapshot:1	Epoch:1	Loss:24.9	MRR:9.24	Hits@10:19.13	Best:9.24	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.636e-03,gradB=6.915e-04,paramA=6.670e+02,paramB=5.748e+02,countA=3,countB=3)
+2026-04-21 02:34:40,899: Snapshot:1	Epoch:2	Loss:24.063	MRR:9.79	Hits@10:20.48	Best:9.79	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.341e-03,gradB=6.421e-04,paramA=7.741e+02,paramB=6.305e+02,countA=3,countB=3)
+2026-04-21 02:34:56,036: Snapshot:1	Epoch:3	Loss:23.661	MRR:10.14	Hits@10:20.71	Best:10.14	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.219e-03,gradB=6.116e-04,paramA=8.751e+02,paramB=6.825e+02,countA=3,countB=3)
+2026-04-21 02:35:12,028: Snapshot:1	Epoch:4	Loss:23.364	MRR:10.2	Hits@10:21.04	Best:10.2	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.130e-03,gradB=5.877e-04,paramA=9.700e+02,paramB=7.323e+02,countA=3,countB=3)
+2026-04-21 02:35:26,682: Snapshot:1	Epoch:5	Loss:23.117	MRR:10.39	Hits@10:21.39	Best:10.39	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.051e-03,gradB=5.641e-04,paramA=1.056e+03,paramB=7.783e+02,countA=3,countB=3)
+2026-04-21 02:35:42,990: Snapshot:1	Epoch:6	Loss:22.898	MRR:10.55	Hits@10:21.75	Best:10.55	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.005e-03,gradB=5.440e-04,paramA=1.137e+03,paramB=8.215e+02,countA=3,countB=3)
+2026-04-21 02:35:57,734: Snapshot:1	Epoch:7	Loss:22.774	MRR:10.64	Hits@10:21.95	Best:10.64	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.641e-04,gradB=5.242e-04,paramA=1.213e+03,paramB=8.617e+02,countA=3,countB=3)
+2026-04-21 02:36:14,302: Snapshot:1	Epoch:8	Loss:22.633	MRR:10.76	Hits@10:22.08	Best:10.76	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=9.355e-04,gradB=5.074e-04,paramA=1.283e+03,paramB=8.989e+02,countA=3,countB=3)
+2026-04-21 02:36:29,295: Snapshot:1	Epoch:9	Loss:22.575	MRR:10.91	Hits@10:22.06	Best:10.91	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.833e-04,gradB=4.905e-04,paramA=1.349e+03,paramB=9.343e+02,countA=3,countB=3)
+2026-04-21 02:36:45,402: Snapshot:1	Epoch:10	Loss:22.493	MRR:10.99	Hits@10:22.34	Best:10.99	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.411e-04,gradB=4.727e-04,paramA=1.411e+03,paramB=9.683e+02,countA=3,countB=3)
+2026-04-21 02:37:00,261: Snapshot:1	Epoch:11	Loss:22.467	MRR:11.01	Hits@10:22.5	Best:11.01	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=8.094e-04,gradB=4.602e-04,paramA=1.471e+03,paramB=1.001e+03,countA=3,countB=3)
+2026-04-21 02:37:16,365: Snapshot:1	Epoch:12	Loss:22.402	MRR:11.05	Hits@10:22.64	Best:11.05	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.831e-04,gradB=4.471e-04,paramA=1.529e+03,paramB=1.031e+03,countA=3,countB=3)
+2026-04-21 02:37:31,297: Snapshot:1	Epoch:13	Loss:22.385	MRR:11.09	Hits@10:22.75	Best:11.09	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.544e-04,gradB=4.364e-04,paramA=1.586e+03,paramB=1.061e+03,countA=3,countB=3)
+2026-04-21 02:37:46,609: Snapshot:1	Epoch:14	Loss:22.37	MRR:11.15	Hits@10:22.77	Best:11.15	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.339e-04,gradB=4.236e-04,paramA=1.640e+03,paramB=1.090e+03,countA=3,countB=3)
+2026-04-21 02:38:02,763: Snapshot:1	Epoch:15	Loss:22.357	MRR:11.17	Hits@10:22.7	Best:11.17	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=7.099e-04,gradB=4.156e-04,paramA=1.693e+03,paramB=1.117e+03,countA=3,countB=3)
+2026-04-21 02:38:17,673: Snapshot:1	Epoch:16	Loss:22.311	MRR:11.08	Hits@10:22.7	Best:11.17	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.898e-04,gradB=4.056e-04,paramA=1.745e+03,paramB=1.144e+03,countA=3,countB=3)
+2026-04-21 02:38:33,774: Snapshot:1	Epoch:17	Loss:22.254	MRR:11.17	Hits@10:23.07	Best:11.17	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.741e-04,gradB=3.970e-04,paramA=1.796e+03,paramB=1.171e+03,countA=3,countB=3)
+2026-04-21 02:38:48,475: Snapshot:1	Epoch:18	Loss:22.309	MRR:11.39	Hits@10:23.05	Best:11.39	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.606e-04,gradB=3.908e-04,paramA=1.847e+03,paramB=1.196e+03,countA=3,countB=3)
+2026-04-21 02:39:04,928: Snapshot:1	Epoch:19	Loss:22.272	MRR:11.17	Hits@10:22.67	Best:11.39	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.388e-04,gradB=3.819e-04,paramA=1.897e+03,paramB=1.222e+03,countA=3,countB=3)
+2026-04-21 02:39:19,737: Snapshot:1	Epoch:20	Loss:22.225	MRR:11.27	Hits@10:22.99	Best:11.39	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.289e-04,gradB=3.749e-04,paramA=1.946e+03,paramB=1.247e+03,countA=3,countB=3)
+2026-04-21 02:39:35,786: Early Stopping! Snapshot:1 Epoch: 21 Best Results: 11.39
+2026-04-21 02:39:35,930: => loading checkpoint './checkpoint/RELATION/1model_best.tar'
+2026-04-21 02:39:58,671: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:40:21,352: Snapshot:2	Epoch:0	Loss:26.983	MRR:8.9	Hits@10:14.15	Best:8.9	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.974e-03,gradB=1.541e-03,paramA=2.889e+02,paramB=5.029e+02,countA=3,countB=3)
+2026-04-21 02:40:32,298: Snapshot:2	Epoch:1	Loss:21.859	MRR:9.71	Hits@10:15.37	Best:9.71	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.736e-03,gradB=7.645e-04,paramA=3.378e+02,paramB=5.471e+02,countA=3,countB=3)
+2026-04-21 02:40:44,312: Snapshot:2	Epoch:2	Loss:21.425	MRR:9.84	Hits@10:15.57	Best:9.84	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.592e-03,gradB=7.487e-04,paramA=3.797e+02,paramB=5.900e+02,countA=3,countB=3)
+2026-04-21 02:40:54,790: Snapshot:2	Epoch:3	Loss:21.21	MRR:10.03	Hits@10:16.26	Best:10.03	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.459e-03,gradB=7.155e-04,paramA=4.177e+02,paramB=6.289e+02,countA=3,countB=3)
+2026-04-21 02:41:05,531: Snapshot:2	Epoch:4	Loss:21.065	MRR:10.09	Hits@10:16.36	Best:10.09	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.317e-03,gradB=6.833e-04,paramA=4.502e+02,paramB=6.634e+02,countA=3,countB=3)
+2026-04-21 02:41:17,438: Snapshot:2	Epoch:5	Loss:20.962	MRR:10.11	Hits@10:16.52	Best:10.11	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.265e-03,gradB=6.639e-04,paramA=4.816e+02,paramB=6.960e+02,countA=3,countB=3)
+2026-04-21 02:41:27,971: Snapshot:2	Epoch:6	Loss:20.935	MRR:10.21	Hits@10:16.41	Best:10.21	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.192e-03,gradB=6.419e-04,paramA=5.107e+02,paramB=7.255e+02,countA=3,countB=3)
+2026-04-21 02:41:38,650: Snapshot:2	Epoch:7	Loss:20.918	MRR:10.45	Hits@10:16.81	Best:10.45	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.141e-03,gradB=6.217e-04,paramA=5.376e+02,paramB=7.541e+02,countA=3,countB=3)
+2026-04-21 02:41:50,683: Snapshot:2	Epoch:8	Loss:20.879	MRR:10.54	Hits@10:16.85	Best:10.54	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.084e-03,gradB=5.998e-04,paramA=5.626e+02,paramB=7.812e+02,countA=3,countB=3)
+2026-04-21 02:42:01,267: Snapshot:2	Epoch:9	Loss:20.879	MRR:10.25	Hits@10:16.57	Best:10.54	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.055e-03,gradB=5.803e-04,paramA=5.866e+02,paramB=8.079e+02,countA=3,countB=3)
+2026-04-21 02:42:11,824: Snapshot:2	Epoch:10	Loss:20.816	MRR:10.39	Hits@10:16.79	Best:10.54	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.009e-03,gradB=5.651e-04,paramA=6.096e+02,paramB=8.332e+02,countA=3,countB=3)
+2026-04-21 02:42:23,601: Early Stopping! Snapshot:2 Epoch: 11 Best Results: 10.54
+2026-04-21 02:42:23,696: => loading checkpoint './checkpoint/RELATION/2model_best.tar'
+2026-04-21 02:42:56,084: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
+|     2      | 0.1014 | 0.0653 | 0.1038 | 0.1248 |  0.1655 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:43:07,760: Snapshot:3	Epoch:0	Loss:12.672	MRR:15.26	Hits@10:22.62	Best:15.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=5.000e-03,gradB=1.785e-03,paramA=2.758e+02,paramB=4.560e+02,countA=3,countB=3)
+2026-04-21 02:43:13,095: Snapshot:3	Epoch:1	Loss:8.477	MRR:14.77	Hits@10:23.7	Best:15.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.216e-03,gradB=8.722e-04,paramA=3.169e+02,paramB=5.008e+02,countA=3,countB=3)
+2026-04-21 02:43:18,186: Snapshot:3	Epoch:2	Loss:8.088	MRR:14.39	Hits@10:23.96	Best:15.26	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.964e-03,gradB=8.146e-04,paramA=3.395e+02,paramB=5.223e+02,countA=3,countB=3)
+2026-04-21 02:43:23,204: Early Stopping! Snapshot:3 Epoch: 3 Best Results: 15.26
+2026-04-21 02:43:23,280: => loading checkpoint './checkpoint/RELATION/3model_best.tar'
+2026-04-21 02:44:00,864: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
+|     2      | 0.1014 | 0.0653 | 0.1038 | 0.1248 |  0.1655 |
+|     3      | 0.1474 | 0.1035 | 0.1603 | 0.1857 |  0.2238 |
++------------+--------+--------+--------+--------+---------+
+Start training =============================
+2026-04-21 02:44:10,232: Snapshot:4	Epoch:0	Loss:12.189	MRR:9.49	Hits@10:18.68	Best:9.49	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=6.022e-03,gradB=1.921e-03,paramA=1.396e+02,paramB=3.939e+02,countA=3,countB=3)
+2026-04-21 02:44:13,777: Snapshot:4	Epoch:1	Loss:9.218	MRR:11.14	Hits@10:20.49	Best:11.14	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=4.482e-03,gradB=1.188e-03,paramA=1.780e+02,paramB=4.561e+02,countA=3,countB=3)
+2026-04-21 02:44:17,279: Snapshot:4	Epoch:2	Loss:8.742	MRR:11.6	Hits@10:20.94	Best:11.6	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=3.496e-03,gradB=9.896e-04,paramA=1.908e+02,paramB=4.808e+02,countA=3,countB=3)
+2026-04-21 02:44:20,776: Snapshot:4	Epoch:3	Loss:8.565	MRR:11.94	Hits@10:21.88	Best:11.94	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.897e-03,gradB=9.254e-04,paramA=2.002e+02,paramB=4.982e+02,countA=3,countB=3)
+2026-04-21 02:44:24,315: Snapshot:4	Epoch:4	Loss:8.477	MRR:11.91	Hits@10:22.2	Best:11.94	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.540e-03,gradB=8.800e-04,paramA=2.079e+02,paramB=5.119e+02,countA=3,countB=3)
+2026-04-21 02:44:27,918: Snapshot:4	Epoch:5	Loss:8.406	MRR:12.15	Hits@10:22.44	Best:12.15	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.315e-03,gradB=8.357e-04,paramA=2.150e+02,paramB=5.235e+02,countA=3,countB=3)
+2026-04-21 02:44:31,466: Snapshot:4	Epoch:6	Loss:8.41	MRR:12.43	Hits@10:22.55	Best:12.43	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.156e-03,gradB=8.184e-04,paramA=2.216e+02,paramB=5.346e+02,countA=3,countB=3)
+2026-04-21 02:44:36,303: Snapshot:4	Epoch:7	Loss:8.325	MRR:12.66	Hits@10:22.66	Best:12.66	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=2.137e-03,gradB=7.896e-04,paramA=2.277e+02,paramB=5.452e+02,countA=3,countB=3)
+2026-04-21 02:44:39,838: Snapshot:4	Epoch:8	Loss:8.346	MRR:12.63	Hits@10:22.67	Best:12.66	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.941e-03,gradB=7.700e-04,paramA=2.332e+02,paramB=5.548e+02,countA=3,countB=3)
+2026-04-21 02:44:43,370: Snapshot:4	Epoch:9	Loss:8.319	MRR:12.79	Hits@10:22.54	Best:12.79	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.780e-03,gradB=7.510e-04,paramA=2.386e+02,paramB=5.641e+02,countA=3,countB=3)
+2026-04-21 02:44:46,901: Snapshot:4	Epoch:10	Loss:8.296	MRR:12.45	Hits@10:22.56	Best:12.79	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.718e-03,gradB=7.350e-04,paramA=2.437e+02,paramB=5.729e+02,countA=3,countB=3)
+2026-04-21 02:44:50,440: Snapshot:4	Epoch:11	Loss:8.294	MRR:12.67	Hits@10:22.78	Best:12.79	LoRAStats(lrA=1.00e-01,lrB=1.00e-01,gradA=1.710e-03,gradB=7.175e-04,paramA=2.489e+02,paramB=5.818e+02,countA=3,countB=3)
+2026-04-21 02:44:53,961: Early Stopping! Snapshot:4 Epoch: 12 Best Results: 12.79
+2026-04-21 02:44:54,045: => loading checkpoint './checkpoint/RELATION/4model_best.tar'
+2026-04-21 02:45:33,877: 
++------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
+|     2      | 0.1014 | 0.0653 | 0.1038 | 0.1248 |  0.1655 |
+|     3      | 0.1474 | 0.1035 | 0.1603 | 0.1857 |  0.2238 |
+|     4      | 0.1228 | 0.0742 | 0.1261 | 0.1623 |  0.2204 |
++------------+--------+--------+--------+--------+---------+
+2026-04-21 02:45:33,878: Final Result:
+[+------------+--------+--------+--------+--------+---------+
+| Snapshot:0 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:1 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:2 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
+|     2      | 0.1014 | 0.0653 | 0.1038 | 0.1248 |  0.1655 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:3 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
+|     2      | 0.1014 | 0.0653 | 0.1038 | 0.1248 |  0.1655 |
+|     3      | 0.1474 | 0.1035 | 0.1603 | 0.1857 |  0.2238 |
++------------+--------+--------+--------+--------+---------+, +------------+--------+--------+--------+--------+---------+
+| Snapshot:4 |  MRR   | Hits@1 | Hits@3 | Hits@5 | Hits@10 |
++------------+--------+--------+--------+--------+---------+
+|     0      | 0.2788 | 0.1727 | 0.3414 | 0.4075 |  0.4755 |
+|     1      | 0.1141 | 0.0532 | 0.1336 | 0.172  |  0.2313 |
+|     2      | 0.1014 | 0.0653 | 0.1038 | 0.1248 |  0.1655 |
+|     3      | 0.1474 | 0.1035 | 0.1603 | 0.1857 |  0.2238 |
+|     4      | 0.1228 | 0.0742 | 0.1261 | 0.1623 |  0.2204 |
++------------+--------+--------+--------+--------+---------+]
+2026-04-21 02:45:33,878: Report Result:
++----------+--------------------+-----------+--------------+--------------+---------------+
+| Snapshot |        Time        | Whole_MRR | Whole_Hits@1 | Whole_Hits@3 | Whole_Hits@10 |
++----------+--------------------+-----------+--------------+--------------+---------------+
+|    0     | 90.61977624893188  |   0.279   |    0.173     |    0.341     |     0.475     |
+|    1     | 343.07885003089905 |   0.199   |    0.115     |     0.24     |     0.357     |
+|    2     | 135.24525332450867 |   0.174   |    0.102     |    0.205     |     0.308     |
+|    3     | 22.968608140945435 |   0.171   |    0.102     |    0.201     |     0.299     |
+|    4     | 50.071478843688965 |   0.168   |     0.1      |    0.196     |     0.294     |
++----------+--------------------+-----------+--------------+--------------+---------------+
+2026-04-21 02:45:33,878: Sum_Training_Time:641.983966588974
+2026-04-21 02:45:33,878: Every_Training_Time:[90.61977624893188, 343.07885003089905, 135.24525332450867, 22.968608140945435, 50.071478843688965]
+2026-04-21 02:45:33,878: Forward transfer: 0.012199999999999999 Backward transfer: 0.0
+2026-04-21 02:45:33,990: Loss curve saved to: ./logs/20260421023151/RELATION/loss_curve.png

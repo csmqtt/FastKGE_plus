@@ -1,0 +1,228 @@
+\documentclass[12pt,a4paper]{ctexart}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{float}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\setlist[itemize]{leftmargin=1.8em}
+\setlist[enumerate]{leftmargin=2em}
+\renewcommand{\arraystretch}{1.2}
+
+\title{\textbf{毕业设计阶段性进展汇报}\\[4pt]
+\large 基于 LoRA 的增量知识图谱嵌入模型优化与实验分析}
+\author{学生：\underline{\hspace{3cm}} \qquad 指导教师：\underline{\hspace{3cm}}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{课题目标}
+本课题围绕增量知识图谱嵌入任务展开，研究对象为基于 LoRA 的增量训练模型。当前工作的总体目标包括两部分：
+\begin{enumerate}
+  \item 在多个公开数据集上复现并分析原始方法与改进方法的表现差异；
+  \item 在尽量不降低精度的前提下，提升模型在增量快照训练过程中的稳定性与训练效率。
+\end{enumerate}
+
+目前的研究重点已经从单纯追求某一次实验的最好结果，转向了更符合毕业设计要求的路径：\textbf{构建可复现、可解释、可比较的优化流程，并给出明确的实验分析结论。}
+
+\section{目前已完成的主要工作}
+
+\subsection{完成原始 baseline 的复现与问题回溯}
+课题早期首先重新运行了原论文版本在多个数据集上的实验，并将结果作为对照基线。通过这一过程，发现“优化后版本在部分数据集上效果下降”并不能直接说明模型退化，其背后受到以下因素共同影响：
+\begin{itemize}
+  \item 单次随机种子导致的结果波动；
+  \item 不同数据集采用的超参数组合差异；
+  \item 早停策略对微小验证集波动过于敏感；
+  \item 训练效率过低，使得多组对照实验难以快速完成。
+\end{itemize}
+
+这一阶段的工作意义在于：为后续所有改进建立了更可靠的比较基准，并将“结果不一致”的原因从模型结构、训练配置、随机性和实验方法中逐步拆分出来。
+
+\subsection{对 Graph Layering 机制进行了扩展}
+在对模型结构进行分析后，发现原先的 Graph Layering 主要聚焦于实体侧，而对于 \texttt{HYBRID}、\texttt{RELATION} 这类关系变化更明显的数据集，仅依赖实体侧增量适配是不够的。针对这一问题，当前工作已经完成：
+\begin{itemize}
+  \item 关系侧 LoRA 分层模块的引入；
+  \item 关系层数与关系 rank 的独立配置支持；
+  \item 实体侧与关系侧联合的分层参数组织方式。
+\end{itemize}
+
+该改动的目的，是让模型在处理新增关系或关系结构变化较强的增量快照时，能够获得更细粒度的结构适配能力。
+
+\subsection{完成了多轮训练效率优化}
+为了降低单次实验开销、提升迭代效率，已经围绕训练流程完成了多项效率优化。主要包括：
+\begin{enumerate}
+  \item \textbf{静态张量缓存（Permutation / arange caching）}：将每个 snapshot 中可重复使用的张量提前缓存，减少训练中重复创建和索引转换的开销。
+  \item \textbf{精度切换与默认 FP32 化}：将原本大量沿用 FP64 的训练路径改为可配置精度模式，并将默认训练精度设置为 FP32，在消费级 GPU 环境下显著降低时间成本。
+  \item \textbf{LoRA 统计采样降频}：将高频梯度统计改为更低开销的 epoch 级统计，减少由于同步操作导致的额外停顿。
+  \item \textbf{DataLoader 并行化改造}：引入 \texttt{num\_workers}、\texttt{persistent\_workers}、\texttt{pin\_memory} 与 \texttt{non\_blocking} 传输路径，以减少 CPU 侧等待时间。
+  \item \textbf{稀疏 gather 路径尝试}：尝试通过 sparse-gather 避免大张量拼接，但实验表明其收益低于预期，因此目前已保留开关但默认关闭。
+\end{enumerate}
+
+\subsection{提出并实现了抗噪早停机制}
+在连续实验中，一个非常关键的问题是：早停策略对微小浮点波动非常敏感。即便两条实现路径在数学上近似等价，也可能因为验证集指标的极小波动，导致训练 epoch 数发生明显变化，从而干扰时间与精度对比。
+
+针对这一问题，已经引入最小显著改进阈值 \texttt{es\_min\_delta}，将：
+\begin{itemize}
+  \item “是否保存 best checkpoint”
+  \item “是否重置早停计数器”
+\end{itemize}
+这两个逻辑进行了解耦。这样做之后，微小数值波动不会再轻易延长训练过程，从而提升不同版本之间实验比较的稳定性。
+
+\subsection{构建了 profiler 分析流程并定位主要瓶颈}
+为了避免仅凭经验进行优化，当前工作已经引入训练过程 profiling。通过在指定 snapshot / epoch / batch 范围内采样训练开销，已经得到如下结论：
+\begin{itemize}
+  \item 真正的主要瓶颈并不完全在 GPU kernel 本身；
+  \item CPU 侧的数据准备与 DataLoader 等待时间在若干阶段占比很高；
+  \item 某些看起来较重的操作（如大张量 \texttt{cat}）在理论上值得优化，但在实际训练中未必是关键路径。
+\end{itemize}
+
+这说明当前优化工作已经从“凭直觉改结构”过渡到了“基于证据定位瓶颈”的阶段。
+
+\subsection{基于版本记录形成了完整的迭代轨迹}
+除代码实现与实验结果外，本课题还持续维护了版本记录文件，对每一轮改动的动机、具体实现、实测结果和回滚原因进行了整理。这一点对于毕业设计尤其重要，因为它表明当前成果并不是偶然得到的，而是通过持续迭代逐步收敛得到的。结合 \texttt{recordforstep} 中的记录，当前版本演进大致可以概括为以下几个阶段：
+\begin{itemize}
+  \item \textbf{V1--V1.2：显存与推理开销治理。} 这一阶段主要围绕基础可运行性展开，例如在评估阶段补充 \texttt{torch.no\_grad()}、在预测阶段将全量候选实体打分改为分块计算，以降低显存压力。说明课题初期已经不仅关注“是否能跑”，还关注“是否能稳定跑完”。
+  \item \textbf{V2--V2.4：优化器、初始化、调度器与早停机制探索。} 该阶段尝试引入 LoRA+、AdamW、warmup + cosine 学习率调度、梯度裁剪以及面向 FB/WN 的数据集预设。过程中发现，某些理论上合理的配置在特定数据集上并不带来收益，反而可能破坏原先有效的结构组合，因此后续又逐步进行了回滚与消融。
+  \item \textbf{V2.5 及其修正：从“苹果比橘子”到公平对比。} 在这一阶段明确认识到，先前不少 baseline 对比并不完全公平，因为模型类别、学习率规模和是否启用特殊结构并不一致。重新按可比配置对齐后，才得出“FB/WN 上基本追平、部分阶段略有收益”的更可信结论。
+  \item \textbf{V2.5.1：参数类型与脚本健壮性修复。} 记录中专门保留了诸如 \texttt{-patience} 未声明为整数、命令行参数传入后变成字符串等问题。这类内容虽然不属于算法创新，但体现了实验脚本与工程环境稳定化的过程，也为后续多轮批量实验打下基础。
+  \item \textbf{V2.6--V2.10：当前主线形成。} 从关系侧 Graph Layering 扩展开始，到 permutation caching、FP32、DataLoader 并行、sparse-gather 验证，再到抗噪早停，当前主线已经从“尝试多种优化”逐步收敛为“保留真正有效、可解释、可稳定复现的改动”。
+\end{itemize}
+
+换言之，\texttt{recordforstep} 不只是开发日志，而是本课题研究过程的重要证据。它体现出：当前成果是经过尝试、验证、失败、回滚和再设计之后逐步形成的，而不是一次性拍脑袋得出的结果。
+
+\section{阶段性贡献总结}
+截至目前，可以将本课题的阶段性贡献概括为以下几点：
+\begin{enumerate}
+  \item 完成了 LoRA 增量知识图谱嵌入模型的复现、校验与再评估，明确了原始 baseline 与改进版本差异的多个来源；
+  \item 对 Graph Layering 机制进行了扩展，使其由实体侧推广到关系侧，提高了模型对关系增量场景的适应能力；
+  \item 提出并实现了多项训练效率优化，包括静态缓存、FP32 路径、LoRA 统计降频和 DataLoader 并行化；
+  \item 提出了抗噪早停机制，增强了实验结果的稳定性和不同优化版本之间的可比性；
+  \item 构建了基于 profiler 的训练瓶颈分析流程，使优化过程具备更强的可解释性和工程可信度。
+\end{enumerate}
+
+\section{代表性实验结果}
+
+\subsection{重要版本演进}
+\begin{table}[H]
+\centering
+\caption{当前阶段的关键版本演进}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{1.8cm} >{\raggedright\arraybackslash}p{3.7cm} X}
+\toprule
+版本 & 主要改动 & 说明 \\
+\midrule
+V1--V1.2 & 显存与推理路径初步治理 & 增加 \texttt{torch.no\_grad()}，将预测阶段改为 chunked scoring，解决显存峰值问题，为后续实验提供基本可运行条件。 \\
+V2--V2.4 & 优化器/初始化/调度器探索 & 尝试 LoRA+、AdamW、warmup + cosine、梯度裁剪与数据集预设，后续通过消融和回滚识别出其中的正交收益与负收益。 \\
+V2.5--V2.5.1 & 公平对比与脚本稳定化 & 重新按可比配置对齐 baseline，对 \texttt{patience} 等参数类型问题进行修复，避免批量实验因脚本问题中断。 \\
+V2.6 & 关系侧 Graph Layering 扩展 & 将 Graph Layering 从实体侧扩展到关系侧，重点面向 \texttt{HYBRID}/\texttt{RELATION} 场景。 \\
+V2.7 & Permutation caching + profiler & 引入静态缓存与训练过程 profiling，为后续性能定位提供依据。 \\
+V2.8 & FP32 + DataLoader 并行 + LoRA 统计降采样 & 显著降低训练总时间，是当前效率提升的重要阶段。 \\
+V2.9 & Sparse-gather 尝试 & 理论上减少张量拼接开销，但实测收益不稳定，因此保留开关、默认关闭。 \\
+V2.10 & 抗噪早停 + 回退 P2 默认值 & 解决不同版本比较被早停随机性干扰的问题，形成当前较稳定的 baseline。 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{HYBRID 数据集上的代表性结果}
+当前阶段主要围绕 \texttt{HYBRID} 数据集进行了较深入的分析，因为该数据集在增量训练中训练成本较高、问题表现更典型，适合作为优化验证对象。
+
+\begin{table}[H]
+\centering
+\caption{HYBRID 数据集上的代表性结果对比}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.2cm} >{\centering\arraybackslash}p{2.4cm} >{\centering\arraybackslash}p{2.9cm} X}
+\toprule
+实验版本 & Whole\_MRR@S4 & Sum\_Training\_Time & 说明 \\
+\midrule
+V2.7（P1） & 0.195 & 770.7 s & 训练效率较低，仍存在明显 CPU / 数据准备开销。 \\
+V2.8（FP32 等） & 0.190 & 526.6 s & 在精度基本稳定的前提下，训练总时间显著下降。 \\
+V2.9（P2 on） & 0.198 & 644.9 s & 稀疏 gather 路径未带来稳定收益，且容易受到早停随机性影响。 \\
+V2.10（当前主线） & 0.197 & 393.8 s & 当前较稳定的主线结果，兼顾了训练时间与实验可比性。 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+从上述结果可以看出：
+\begin{itemize}
+  \item 与较早阶段版本相比，当前主线版本已经在训练时间上取得明显下降；
+  \item 当前主线版本在精度上没有出现明显退化，整体结果保持在可接受范围内；
+  \item 某些理论上“应当更快”的优化，实际效果未必显著，因此本课题也保留了负结果分析，而非只展示正向实验。
+\end{itemize}
+
+\subsection{从记录文件中归纳出的关键实验结论}
+结合 \texttt{recordforstep} 中对不同版本的详细记录，可以进一步归纳出以下几条对课题方向具有决定意义的实验结论：
+\begin{enumerate}
+  \item \textbf{并非所有“更复杂的训练技巧”都一定带来更好结果。} 在 V2 阶段，引入更复杂的初始化、优化器分组、权重衰减和调度器之后，曾经在部分数据集上出现明显回退。后续通过逐项回滚和消融，才识别出哪些改动是正交有效的，哪些改动反而破坏了原有结构优势。
+  \item \textbf{公平比较比单次最好结果更重要。} V2.5 阶段明确指出，如果 baseline 与对照组在模型类别、学习率、LoRA 配置等方面并不一致，那么结果对比本身就不成立。因此当前汇报中的主线结论更强调“可比条件下的结论”，而不是单纯追求更大的数值提升。
+  \item \textbf{真正有效的效率优化往往来自系统路径，而不是单个看起来很重的算子。} 例如 V2.8 中 FP32、DataLoader 并行和统计降频带来了显著总时间下降；而 V2.9 中针对 \texttt{torch.cat} 的 sparse-gather 改造虽然理论上优雅，但实测效果有限，说明瓶颈定位必须依赖真实 profiling。
+  \item \textbf{实验方法本身也需要被优化。} V2.10 所解决的问题并不是模型表达能力，而是实验结论是否可靠。通过引入抗噪早停，当前实验的时间与精度比较才真正具备方法学上的可信度。
+\end{enumerate}
+
+\subsection{稳定性观察}
+截至目前，当前主线版本在不同随机种子下已经表现出较好的稳定性。已完成的两个 seed 实验结果如下：
+\begin{table}[H]
+\centering
+\caption{V2.10 主线配置在 HYBRID 上的 seed 结果}
+\begin{tabular}{ccc}
+\toprule
+随机种子 & Whole\_MRR@S4 & Sum\_Training\_Time \\
+\midrule
+3407 & 0.197 & 393.8 s \\
+42 & 0.197 & 386.1 s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+从目前结果看，当前配置在 \texttt{HYBRID} 上已经具备较好的实验稳定性，这对毕业设计后续整理与撰写是一个积极信号。
+
+\section{当前结论}
+结合当前的实验结果与分析，现阶段可以得到如下结论：
+\begin{enumerate}
+  \item 本课题已经不仅仅停留在“模型复现”阶段，而是完成了结构扩展、训练优化、实验稳定性提升和瓶颈归因分析等多项工作；
+  \item 目前已经形成了一条较清晰的主线方案，即：\textbf{关系侧 Graph Layering + 多阶段效率优化 + 抗噪早停}；
+  \item 当前主线版本在训练效率上已有明显进展，在精度上保持稳定，已具备作为毕业设计阶段性成果进行汇报的条件；
+  \item 一些进一步优化方向（如更激进的 DataLoader / GPU 侧负采样方案）仍有探索空间，但已经不影响当前课题形成完整的中期或阶段性汇报成果。
+\end{enumerate}
+
+\section{当前存在的问题}
+虽然已经取得一定阶段成果，但目前仍存在以下问题：
+\begin{itemize}
+  \item 多数据集上的系统性对照仍需进一步补齐；
+  \item 第三个随机种子结果尚未完成，当前稳定性结论仍属于阶段性结论；
+  \item profiler 在当前环境下对 CUDA 事件的捕获存在局限，因此部分 GPU 侧细粒度开销仍需结合环境进一步分析；
+  \item DataLoader 与数据构造部分仍是潜在瓶颈，后续若有时间可继续优化。
+\end{itemize}
+
+\section{下一步计划}
+下一阶段计划主要包括以下几个方面：
+\begin{enumerate}
+  \item 完成当前主线配置的多 seed 补充实验，并对稳定性进行最终确认；
+  \item 针对 \texttt{ENTITY}、\texttt{FACT}、\texttt{RELATION} 等数据集补充整理关键对照结果；
+  \item 评估是否需要将 \texttt{num\_workers=4} 等轻量优化固化为默认训练配置；
+  \item 将现有结果整理为毕业论文中的“方法设计”“实验分析”“效率优化”三个核心部分；
+  \item 进一步整理图表、版本演进记录和实验结论，为论文撰写和答辩展示做准备。
+\end{enumerate}
+
+\section{总结}
+总体来看，当前课题已经完成了从 baseline 复现、问题定位、结构改进、效率优化到实验分析的一整套工作流程。与单纯运行模型相比，本阶段工作更强调：
+\begin{itemize}
+  \item 结果的可解释性；
+  \item 不同优化方案之间的可比性；
+  \item 在工程可落地前提下的训练效率提升；
+  \item 面向毕业设计汇报所需要的完整性和条理性。
+\end{itemize}
+
+因此，目前的阶段成果已经能够较好地支撑一次向指导教师汇报研究进展的 PDF 文档，也为后续论文撰写与答辩准备打下了较为扎实的基础。
+
+\end{document}

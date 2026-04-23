@@ -24,9 +24,23 @@ def set_seeds(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
+""" Training precision helper.
+
+The original paper stores all embeddings in FP64 (`.double()`). On consumer
+GPUs this is a massive hidden bottleneck: RTX 30xx/40xx FP64 throughput is
+~1/32 of FP32, and the KGE forward is matmul-dominated. Routing every
+`.double()` site through this helper lets us flip the whole codebase to FP32
+with `-precision fp32` (default) while still being able to reproduce the
+paper exactly with `-precision fp64`.
+"""
+def model_dtype(args) -> torch.dtype:
+    p = str(getattr(args, "precision", "fp32")).lower()
+    return torch.float64 if p in ("fp64", "double", "float64") else torch.float32
+
 """ Get learnable parameters """
-def get_param(shape):
-    param = Parameter(torch.Tensor(*shape)).double()
+def get_param(shape, args=None):
+    dtype = model_dtype(args) if args is not None else torch.float64
+    param = Parameter(torch.Tensor(*shape).to(dtype=dtype))
     xavier_normal_(param.data)
     return param
 

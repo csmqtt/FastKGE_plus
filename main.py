@@ -1,3 +1,4 @@
+import math
 import shutil
 from datetime import datetime
 import logging
@@ -11,6 +12,36 @@ from src.model.LoraKGE_Layers import TransE as LoraKGE_Layers
 from src.train import *
 from src.test import *
 from src.plot_loss import plot_loss_curve
+
+
+def _build_lr_scheduler(optimizer, args):
+    """Linear warmup -> cosine decay on a shared multiplier (preserves LoRA+ ratio across groups).
+
+    V2.4: by default the scheduler is applied ONLY to snapshot 0 (the base TransE
+    training). On LoRA snapshots (snap >= 1), constant lr matches the V1.x
+    baseline and avoids the ~35% effective-training-budget cut that cosine
+    decay introduces — empirically that cut causes a ~5-6pp MRR regression on
+    FB_CKGE S1/S2/S3. Set -scheduler_lora_snapshots to opt back into the old
+    "scheduler everywhere" behavior.
+    """
+    if not getattr(args, "use_lr_scheduler", False):
+        return None
+    if int(getattr(args, "snapshot", 0)) > 0 and not getattr(
+        args, "scheduler_lora_snapshots", False
+    ):
+        return None
+    warmup = max(1, int(getattr(args, "warmup_epochs", 5)))
+    total = max(1, int(args.epoch_num))
+    min_ratio = float(getattr(args, "min_lr_ratio", 0.1))
+
+    def lr_lambda(epoch: int) -> float:
+        if epoch < warmup:
+            return (epoch + 1) / warmup
+        progress = (epoch - warmup) / max(1, total - warmup)
+        progress = min(max(progress, 0.0), 1.0)
+        return min_ratio + (1.0 - min_ratio) * 0.5 * (1.0 + math.cos(math.pi * progress))
+
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
 class Instructor():
     """ The instructor of the model """
@@ -30,6 +61,15 @@ class Instructor():
 
         self.args.logger.info(self.args)
 
+    def _make_optimizer(self):
+        return self.model.get_lora_plus_optimizer(  # type: ignore[attr-defined]
+            base_lr=float(self.args.learning_rate),
+            loraplus_ratio=float(getattr(self.args, "loraplus_ratio", 16.0)),
+            weight_decay=float(self.args.l2),
+            lora_wd_a=float(getattr(self.args, "lora_wd_a", 0.0)),
+            lora_wd_b=float(getattr(self.args, "lora_wd_b", 0.0)),
+        )
+
     def create_model(self):
         """ Create KGE model and optimizer """
         if self.args.model_name == "LoraKGE_Layers":
@@ -37,13 +77,10 @@ class Instructor():
         else:
             model = LoraKGE_Layers(self.args, self.kg)
         model.to(self.args.device)
-        
-        # [提速修改处 1]：不再使用普通的 Adam，调用模型的 LoRA+ 优化器生成器
-        optimizer = model.get_lora_plus_optimizer(  # type: ignore[attr-defined]
-            base_lr=float(self.args.learning_rate),
-            loraplus_ratio=16.0,
-            weight_decay=self.args.l2,
-        )
+        self.model = model
+
+        optimizer = self._make_optimizer()
+        self.scheduler = _build_lr_scheduler(optimizer, self.args)
         return model, optimizer
 
     def reset_model(self, model=False, optimizer=False):
@@ -55,12 +92,8 @@ class Instructor():
         if model:
             self.model, self.optimizer = self.create_model()
         if optimizer:
-            # [提速修改处 2]：在切换 Snapshot 后重置优化器时，同样使用 LoRA+ 优化器
-            self.optimizer = self.model.get_lora_plus_optimizer(  # type: ignore[attr-defined]
-                base_lr=float(self.args.learning_rate), 
-                loraplus_ratio=16.0, 
-                weight_decay=self.args.l2
-            )
+            self.optimizer = self._make_optimizer()
+            self.scheduler = _build_lr_scheduler(self.optimizer, self.args)
 
     def prepare(self):
         """ Set data path """
@@ -189,6 +222,13 @@ class Instructor():
 
             if self.args.snapshot < int(self.args.snapshot_num) - 1:
                 self.next_snapshot_setting()
+                # V2.4.1 fix: advance args.snapshot BEFORE rebuilding the
+                # optimizer/scheduler, so _build_lr_scheduler's snapshot-based
+                # gating sees the snapshot this optimizer is actually for.
+                # Without this, the scheduler built here for the *next* snapshot
+                # reads the current (old) snapshot id and is always built for
+                # snap 0's semantics.
+                self.args.snapshot = ss_id + 1
                 self.reset_model(optimizer=True)
         self.args.logger.info(f'Final Result:\n{test_results}')
         self.args.logger.info(f'Report Result:\n{report_results}')
@@ -233,25 +273,53 @@ class Instructor():
         for epoch in range(int(self.args.epoch_num)):
             self.args.epoch = epoch
             """ training """
-            loss, valid_res = trainer.run_epoch()
+            loss, valid_res, lora_stats = trainer.run_epoch()
             epoch_losses.append(float(loss))
+            """ per-epoch LR schedule (warmup + cosine) """
+            scheduler = getattr(self, "scheduler", None)
+            if scheduler is not None:
+                scheduler.step()
             """ early stop """
             if self.args.debug:
                 if epoch > 0:
                     break
-            if valid_res[self.args.valid_metrics] > self.best_valid:
-                self.best_valid = valid_res[self.args.valid_metrics]
-                self.stop_epoch = 0
+            # Early-stop counter is suppressed during warmup: while warming up,
+            # lr_A ramps 0→base, so MRR can appear "flat" for several epochs
+            # even though the optimizer is progressing. Counting stop_epoch here
+            # would early-stop before training has had any real chance to
+            # update, which was observed on FB_CKGE snapshots >= 2 (stopping at
+            # epoch 3). Only active when the scheduler is actually running for
+            # this snapshot (see _build_lr_scheduler for V2.4 snapshot gating).
+            scheduler_active = getattr(self, "scheduler", None) is not None
+            warmup = int(getattr(self.args, "warmup_epochs", 0)) if scheduler_active else 0
+            in_warmup = epoch < warmup
+            # V2.10: decouple "best checkpoint" from "stop-counter reset".
+            # Any improvement (even 1e-5 raw MRR) still updates the saved best
+            # checkpoint so the final model uses the strongest weights we ever saw,
+            # but only improvements >= es_min_delta reset stop_epoch. This removes
+            # the sensitivity of early-stop to floating-point noise observed
+            # between V2.8 and V2.9 (S0 stopping at 10 vs 7 epochs from a 0.05pp
+            # wiggle), making per-epoch efficiency measurements meaningful.
+            current = valid_res[self.args.valid_metrics]
+            min_delta = float(getattr(self.args, "es_min_delta", 1e-3))
+            is_best = current > self.best_valid
+            is_meaningful = current > self.best_valid + min_delta
+            if is_best:
+                self.best_valid = current
                 if self.args.snapshot == 0:
                     self.save_model(is_best=True, lora=False)
                 else:
                     self.save_model(is_best=True, lora=True)
             else:
-                self.stop_epoch += 1
                 if self.args.snapshot == 0:
                     self.save_model(lora=False)
                 else:
                     self.save_model(lora=True)
+            if is_meaningful:
+                self.stop_epoch = 0
+            else:
+                if not in_warmup:
+                    self.stop_epoch += 1
                 if self.stop_epoch >= self.args.patience:
                     self.args.logger.info(
                         f'Early Stopping! Snapshot:{self.args.snapshot} Epoch: {epoch} Best Results: {round(self.best_valid * 100, 3)}'
@@ -259,9 +327,23 @@ class Instructor():
                     break
             """ logging """
             if epoch % 1 == 0:
-                self.args.logger.info(
-                    f"Snapshot:{self.args.snapshot}\tEpoch:{epoch}\tLoss:{round(loss, 3)}\tMRR:{round(valid_res['mrr'] * 100, 3)}\tHits@10:{round(valid_res['hits10'] * 100, 3)}\tBest:{round(self.best_valid * 100, 3)}"
+                base_log = (
+                    f"Snapshot:{self.args.snapshot}\tEpoch:{epoch}\tLoss:{round(loss, 3)}"
+                    f"\tMRR:{round(valid_res['mrr'] * 100, 3)}\tHits@10:{round(valid_res['hits10'] * 100, 3)}"
+                    f"\tBest:{round(self.best_valid * 100, 3)}"
                 )
+                if getattr(self.args, "log_lora_stats", False):
+                    a_grad_avg = lora_stats["a_grad_norm_sum"] / max(1, lora_stats["a_grad_steps"])
+                    b_grad_avg = lora_stats["b_grad_norm_sum"] / max(1, lora_stats["b_grad_steps"])
+                    base_log += (
+                        f"\tLoRAStats("
+                        f"lrA={lora_stats['lr_group_0']:.2e},lrB={lora_stats['lr_group_1']:.2e},"
+                        f"gradA={a_grad_avg:.3e},gradB={b_grad_avg:.3e},"
+                        f"paramA={lora_stats['a_param_norm']:.3e},paramB={lora_stats['b_param_norm']:.3e},"
+                        f"countA={lora_stats['a_param_count']},countB={lora_stats['b_param_count']}"
+                        f")"
+                    )
+                self.args.logger.info(base_log)
         end_time = time.time()
         self.loss_history[self.args.snapshot] = epoch_losses
         return end_time - start_time

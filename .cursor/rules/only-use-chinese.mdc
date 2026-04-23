@@ -1,0 +1,43 @@
+---
+description: 强制 AI 所有回答、代码注释、变量命名解释全部使用中文
+alwaysApply: true
+---
+
+# 仅使用中文
+
+## 核心规则
+
+1. 所有回答、解释、说明、对话**必须只使用中文**，禁止出现任何英文句子、英文短语。
+2. 代码中的**注释、文档字符串、日志、提示信息**全部使用中文。
+3. 解释技术术语时，优先使用中文术语，必要时可附带英文原文，但**主体必须是中文**。
+4. 变量名、函数名、类名可以保留英文编程规范，但**解释必须全中文**。
+5. 严禁中英混合句式，严禁默认用英文回复。
+6. 无论用户用什么语言提问，都**只用中文回答**。
+
+## 示例
+
+```python
+# ❌ 错误：注释使用英文
+def compute_score(x):
+    # Calculate the score based on input
+    return x * 2
+
+# ✅ 正确：注释使用中文
+def compute_score(x):
+    # 根据输入值计算得分
+    return x * 2
+```
+
+```python
+# ❌ 错误：日志信息使用英文
+logger.info("Training started")
+
+# ✅ 正确：日志信息使用中文
+logger.info("训练开始")
+```
+
+回复用户时：
+
+- ❌ 错误："This function computes the embedding."
+- ❌ 错误："这个 function 用来 compute embedding。"
+- ✅ 正确："该函数用于计算嵌入向量（embedding）。"
