@@ -60,6 +60,18 @@ class Instructor():
         self.model, self.optimizer = self.create_model()
 
         self.args.logger.info(self.args)
+        self.args.logger.info(
+            "结构配置 entity_layering=%s ent_rank_policy=%s interlayer_mode=%s lora_init=%s quant_bits=%s quant_granularity=%s difficulty_rank_scale=%.3f difficulty_lr_scale=%.3f loraplus_ratio=%.3f",
+            getattr(self.args, "entity_layering", "legacy"),
+            getattr(self.args, "ent_rank_policy", "legacy"),
+            getattr(self.args, "interlayer_lora_mode", "off"),
+            getattr(self.args, "lora_init", "xavier"),
+            getattr(self.args, "quant_init_bits", 8),
+            getattr(self.args, "quant_init_granularity", "row"),
+            float(getattr(self.args, "difficulty_rank_scale", 0.0)),
+            float(getattr(self.args, "difficulty_lr_scale", 0.0)),
+            float(getattr(self.args, "loraplus_ratio", 16.0)),
+        )
 
     def _make_optimizer(self):
         return self.model.get_lora_plus_optimizer(  # type: ignore[attr-defined]
@@ -337,7 +349,7 @@ class Instructor():
                     b_grad_avg = lora_stats["b_grad_norm_sum"] / max(1, lora_stats["b_grad_steps"])
                     base_log += (
                         f"\tLoRAStats("
-                        f"lrA={lora_stats['lr_group_0']:.2e},lrB={lora_stats['lr_group_1']:.2e},"
+                        f"lrMin={lora_stats['lr_min']:.2e},lrMax={lora_stats['lr_max']:.2e},groups={lora_stats['lr_group_count']},"
                         f"gradA={a_grad_avg:.3e},gradB={b_grad_avg:.3e},"
                         f"paramA={lora_stats['a_param_norm']:.3e},paramB={lora_stats['b_param_norm']:.3e},"
                         f"countA={lora_stats['a_param_count']},countB={lora_stats['b_param_count']}"

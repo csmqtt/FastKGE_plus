@@ -47,8 +47,9 @@ class TrainBatchProcessor():
             "b_param_norm": 0.0,
             "a_param_count": 0,
             "b_param_count": 0,
-            "lr_group_0": optimizer.param_groups[0]["lr"] if len(optimizer.param_groups) > 0 else 0.0,
-            "lr_group_1": optimizer.param_groups[1]["lr"] if len(optimizer.param_groups) > 1 else 0.0,
+            "lr_min": min([group["lr"] for group in optimizer.param_groups], default=0.0),
+            "lr_max": max([group["lr"] for group in optimizer.param_groups], default=0.0),
+            "lr_group_count": len(optimizer.param_groups),
         }
         if self.args.record:
             loss_save_path = "/data/my_cl_kge/save/" + str(self.args.snapshot) + ".txt"

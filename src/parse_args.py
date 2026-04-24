@@ -45,9 +45,19 @@ parser.add_argument("-num_rel_layers", dest="num_rel_layers", type=int, default=
 parser.add_argument("-using_various_ranks", dest="using_various_ranks", default=False, help="Using various ranks or not")
 parser.add_argument("-using_various_ranks_reverse", dest="using_various_ranks_reverse", default=False, help="Using reverse various ranks or not")
 parser.add_argument("-explore", dest="explore", default=False, help="Explorable experiments")
-parser.add_argument("-lora_init", dest="lora_init", default="xavier", choices=["pissa", "xavier", "qr", "dora", "zero_b"], help="LoRA init: pissa(SVD), xavier, qr(orthogonal), dora(per-dim g on LoRA delta, no SVD), zero_b(A=kaiming,B=0; canonical LoRA init suited for LoRA+)")
+parser.add_argument("-lora_init", dest="lora_init", default="xavier", choices=["pissa", "xavier", "qr", "dora", "zero_b", "quant_svd"], help="LoRA 初始化方式：pissa 为随机矩阵 SVD，xavier 为随机初始化，qr 为正交初始化，dora 为逐维缩放的 LoRA，zero_b 为 A 随机 B 置零，quant_svd 为量化残差 SVD 初始化")
 parser.add_argument("-use_rs_lora", dest="use_rs_lora", action="store_true", help="Rank-stabilized scaling (alpha/sqrt(r)) on DoRALoraEmbedding only; no effect unless lora_init=dora")
 parser.add_argument("-log_lora_stats", dest="log_lora_stats", action="store_true", help="Log per-epoch LoRA A/B grad/param norms and optimizer group learning rates")
+parser.add_argument("-quant_init_bits", dest="quant_init_bits", type=int, default=8, help="量化残差初始化的量化位宽，仅在 lora_init=quant_svd 时生效")
+parser.add_argument("-quant_init_granularity", dest="quant_init_granularity", default="row", choices=["row", "tensor"], help="量化残差初始化的量化粒度：row 表示逐行量化，tensor 表示整张量量化")
+parser.add_argument("-entity_layering", dest="entity_layering", default="legacy", choices=["legacy", "difficulty"], help="实体分层策略：legacy 使用原始距离排序，difficulty 使用综合难度排序")
+parser.add_argument("-ent_rank_policy", dest="ent_rank_policy", default="legacy", choices=["legacy", "uniform", "difficulty"], help="实体 LoRA 秩分配策略：legacy 兼容旧逻辑，uniform 均匀分配，difficulty 按层难度分配")
+parser.add_argument("-difficulty_rank_scale", dest="difficulty_rank_scale", type=float, default=0.5, help="难度感知秩分配缩放系数，越大越偏向高难层")
+parser.add_argument("-difficulty_lr_scale", dest="difficulty_lr_scale", type=float, default=0.0, help="难度感知学习率缩放系数，0 表示关闭")
+parser.add_argument("-interlayer_lora_mode", dest="interlayer_lora_mode", default="off", choices=["off", "residual", "gate"], help="实体侧层间协同模式：off 关闭，residual 为标量残差融合，gate 为门控投影融合")
+parser.add_argument("-interlayer_stopgrad", dest="interlayer_stopgrad", default="on", choices=["on", "off"], help="层间协同时是否对上一层摘要停止梯度")
+parser.add_argument("-interlayer_init", dest="interlayer_init", type=float, default=0.0, help="层间协同参数初始值")
+parser.add_argument("-log_layer_plan", dest="log_layer_plan", action="store_true", help="记录每个快照的分层顺序、难度、秩分配和学习率缩放")
 
 # P1 profiling (torch.profiler). Off by default. Activates only for a single
 # (snapshot, epoch) pair so we capture one representative training step without
