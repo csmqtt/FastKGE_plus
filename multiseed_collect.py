@@ -26,7 +26,7 @@ import os
 import re
 import statistics
 from collections import defaultdict
-from typing import Any
+from typing import Any, Dict, List, Optional, Tuple
 
 REPORT_ROW = re.compile(
     r"^\|\s*(\d+)\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|\s*$"
@@ -34,7 +34,7 @@ REPORT_ROW = re.compile(
 SUM_TIME = re.compile(r"Sum_Training_Time:([0-9.]+)")
 
 # Paper Table 2/3 MRR (the "MRR" column; equivalent to Whole_MRR @ final snap).
-PAPER_MRR: dict[str, float] = {
+PAPER_MRR: Dict[str, float] = {
     "ENTITY":   0.239,
     "RELATION": 0.185,
     "FACT":     0.203,
@@ -44,7 +44,7 @@ PAPER_MRR: dict[str, float] = {
 }
 
 
-def parse_log(path: str) -> dict[str, Any] | None:
+def parse_log(path: str) -> Optional[Dict[str, Any]]:
     """Return {'snaps': {i: {time, mrr, h1, h3, h10}}, 'sum_time': float}.
 
     We take the LAST "Report Result" block in the file; main.py writes this
@@ -60,7 +60,7 @@ def parse_log(path: str) -> dict[str, Any] | None:
     if idx < 0:
         return None
     tail = text[idx:]
-    snaps: dict[int, dict[str, float]] = {}
+    snaps: Dict[int, Dict[str, float]] = {}
     for line in tail.splitlines():
         m = REPORT_ROW.match(line)
         if m:
@@ -76,9 +76,9 @@ def parse_log(path: str) -> dict[str, Any] | None:
     return {"snaps": snaps, "sum_time": float(sm.group(1)) if sm else None}
 
 
-def gather(tag_dir: str) -> dict[str, dict[int, dict[str, Any]]]:
+def gather(tag_dir: str) -> Dict[str, Dict[int, Dict[str, Any]]]:
     """dataset -> seed -> parsed; picks latest-timestamp log on collision."""
-    by_ds: dict[str, dict[int, dict[str, Any]]] = defaultdict(dict)
+    by_ds: Dict[str, Dict[int, Dict[str, Any]]] = defaultdict(dict)
     for log_path in sorted(glob.glob(os.path.join(tag_dir, "s*", "*", "*.log"))):
         rel = os.path.relpath(log_path, tag_dir).split(os.sep)
         if len(rel) != 3 or not rel[0].startswith("s"):
@@ -100,7 +100,7 @@ def gather(tag_dir: str) -> dict[str, dict[int, dict[str, Any]]]:
     return by_ds
 
 
-def mean_std(xs: list[float]) -> tuple[float, float]:
+def mean_std(xs: List[float]) -> Tuple[float, float]:
     if not xs:
         return float("nan"), float("nan")
     if len(xs) == 1:
@@ -108,7 +108,7 @@ def mean_std(xs: list[float]) -> tuple[float, float]:
     return statistics.mean(xs), statistics.pstdev(xs)
 
 
-def print_summary(tag: str, tag_dir: str, by_ds: dict[str, dict[int, dict[str, Any]]]) -> None:
+def print_summary(tag: str, tag_dir: str, by_ds: Dict[str, Dict[int, Dict[str, Any]]]) -> None:
     print(f"\n=========== tag = {tag}   ({tag_dir})   ===========\n")
 
     hdr = f"{'Dataset':<9} {'n':>2}  {'Whole_MRR@S4 mean ± std':<26} {'paper':>6}  {'Δ vs paper':>11}  {'T(s) mean':>10}"
@@ -147,8 +147,8 @@ def print_summary(tag: str, tag_dir: str, by_ds: dict[str, dict[int, dict[str, A
 
 
 def print_compare(
-    tag_a: str, by_ds_a: dict[str, dict[int, dict[str, Any]]],
-    tag_b: str, by_ds_b: dict[str, dict[int, dict[str, Any]]],
+    tag_a: str, by_ds_a: Dict[str, Dict[int, Dict[str, Any]]],
+    tag_b: str, by_ds_b: Dict[str, Dict[int, Dict[str, Any]]],
 ) -> None:
     print(f"\n=========== compare: {tag_a}  vs  {tag_b}  ===========\n")
     hdr = f"{'Dataset':<9}  {tag_a:<22}  {tag_b:<22}  {'Δ (A-B, pp)':>12}  {'signif?':>8}"

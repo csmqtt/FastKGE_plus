@@ -1,5 +1,6 @@
 import argparse
 import sys
+from typing import Set
 parser = argparse.ArgumentParser(description="Parser For Arguments",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -94,8 +95,8 @@ args = parser.parse_args()
 # This lets `-arg value` always win over presets while still giving FB/WN a
 # stronger default recipe that targets their "large initial snapshot + many
 # new entities per snapshot" regime.
-def _user_cli_flags() -> set:
-    seen: set[str] = set()
+def _user_cli_flags() -> Set[str]:
+    seen: Set[str] = set()
     for tok in sys.argv[1:]:
         if not tok.startswith("-"):
             continue
