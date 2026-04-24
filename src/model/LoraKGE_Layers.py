@@ -2,7 +2,7 @@ import math
 import os
 import re
 from collections import defaultdict, deque
-from typing import Optional, cast
+from typing import Optional, Tuple, cast
 
 import torch.nn.functional as F
 from torch.profiler import record_function
@@ -943,7 +943,7 @@ class TransE(LoraKGE_Layers):
                 lora_rel_embeddings = torch.cat(rel_parts, dim=0)[: self.new_rel_embeddings_len]
         return lora_ent_embeddings, lora_rel_embeddings
 
-    def embedding(self, stage=None) -> tuple[torch.Tensor, torch.Tensor]:
+    def embedding(self, stage=None) -> Tuple[torch.Tensor, torch.Tensor]:
         if self.args.snapshot == 0:
             ent_embeddings = self.ent_embeddings.weight
             rel_embeddings = self.rel_embeddings.weight
