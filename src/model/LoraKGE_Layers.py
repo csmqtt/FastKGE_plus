@@ -2,7 +2,7 @@ import math
 import os
 import re
 from collections import defaultdict, deque
-from typing import cast
+from typing import Optional, cast
 
 import torch.nn.functional as F
 from torch.profiler import record_function
@@ -123,7 +123,7 @@ class LoraKGE_Layers(BaseModel):
             lora_b_param = getattr(module, "lora_B", None)
         return lora_a_param, lora_b_param
 
-    def _write_low_rank_matrix(self, module: nn.Module, target_matrix: torch.Tensor, base_matrix: torch.Tensor | None = None):
+    def _write_low_rank_matrix(self, module: nn.Module, target_matrix: torch.Tensor, base_matrix: Optional[torch.Tensor] = None):
         with torch.no_grad():
             module_weight = cast(torch.Tensor, getattr(module, "weight"))
             if base_matrix is None:
@@ -379,7 +379,7 @@ class LoraKGE_Layers(BaseModel):
         else:
             self.interlayer_ent_projs = None
 
-    def _fuse_with_previous_entity_layer(self, layer_idx: int, current_part: torch.Tensor, previous_part: torch.Tensor | None):
+    def _fuse_with_previous_entity_layer(self, layer_idx: int, current_part: torch.Tensor, previous_part: Optional[torch.Tensor]):
         mode = str(getattr(self.args, "interlayer_lora_mode", "off")).lower()
         if mode == "off" or layer_idx == 0 or previous_part is None or self.interlayer_ent_scales is None:
             return current_part
