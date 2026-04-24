@@ -1,10 +1,13 @@
-# data/
-# save/
-
-# Checkpoints and training logs (any directory level)
-checkpoint/
-checkpoints/
-logs/
-
-# Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.env
+.venv/
+venv/
+checkpoint/
+logs/
+save/
+data/
+.DS_Store
